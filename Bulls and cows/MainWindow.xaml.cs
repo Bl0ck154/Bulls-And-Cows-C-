@@ -68,7 +68,7 @@ namespace Bulls_and_cows
 					cows++;
 			}
 			tries++;
-			playerDataGrid.Items.Add(new { tries, textboxNumber.Text, bulls, cows });
+			playerDataGrid.Items.Add(new Try { Num = tries, Number = textboxNumber.Text, Bulls= bulls,  Cows=cows });
 			playerDataGrid.ScrollIntoView(playerDataGrid.Items[playerDataGrid.Items.Count-1]);
 
 			if(bulls == answerNumber.Length)
@@ -101,6 +101,11 @@ namespace Bulls_and_cows
 				else
 					answerNumber += randomed;
 			}
+		}
+
+		private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+		{
+			Close();
 		}
 	}
 }

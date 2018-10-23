@@ -7,8 +7,25 @@
         mc:Ignorable="d"
         Title="Быки и коровы" Height="450" Width="600">
     <DockPanel>
-		<Menu DockPanel.Dock="Top">asd</Menu>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="File">
+				<MenuItem Header="New game" ></MenuItem>
+				<MenuItem Header="Find online game"></MenuItem>
+				<Separator/>
+				<MenuItem Header="Exit" Click="MenuItemExit_Click"></MenuItem>
+			</MenuItem>
+		</Menu>
 		<Grid Margin="10 0">
+			<Grid.Resources>
+				<DataGrid x:Key="myDataGrid" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*">
+					<DataGrid.Columns>
+						<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
+						<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>
+						<DataGridTextColumn Header="Bulls"  Binding="{Binding Bulls}"/>
+						<DataGridTextColumn Header="Cows"  Binding="{Binding Cows}"/>
+					</DataGrid.Columns>
+				</DataGrid>
+			</Grid.Resources>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition/>
 				<ColumnDefinition/>
@@ -21,8 +38,12 @@
 			<TextBox Grid.ColumnSpan="2" Margin="5" FontSize="20" PreviewTextInput="textbox_OnlyNumeric"
 					 PreviewKeyDown="textbox_restrictSpace" MaxLength="4" Name="textboxNumber"></TextBox>
 			<Button Grid.Column="1" Click="Button_Click" Name="btnStart">Start</Button>
-			<ListBox Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="10"></ListBox>
-			<DataGrid Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10"></DataGrid>
+			
+			
+			<ContentControl Content="{StaticResource myDataGrid}" Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="10"/>
+		
+			<ContentControl Content="{StaticResource myDataGrid}" Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10"/>
+			
 		</Grid>
     </DockPanel>
 </Window>
