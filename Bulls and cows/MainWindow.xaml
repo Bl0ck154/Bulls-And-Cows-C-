@@ -5,8 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bulls_and_cows"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Быки и коровы" Height="450" Width="600">
+    <DockPanel>
+		<Menu DockPanel.Dock="Top">asd</Menu>
+		<Grid Margin="10 0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<TextBox Grid.ColumnSpan="2" Margin="5" FontSize="20" PreviewTextInput="textbox_OnlyNumeric"
+					 PreviewKeyDown="textbox_restrictSpace" MaxLength="4" Name="textboxNumber"></TextBox>
+			<Button Grid.Column="1" Click="Button_Click" Name="btnStart">Start</Button>
+			<ListBox Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="10"></ListBox>
+			<DataGrid Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10"></DataGrid>
+		</Grid>
+    </DockPanel>
 </Window>
