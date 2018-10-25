@@ -17,6 +17,25 @@
 		</Menu>
 		<Grid Margin="10 0">
 			<Grid.Resources>
+				<Style TargetType="ListView">
+					<Setter Property="View">
+						<Setter.Value>
+							<GridView>
+								<GridViewColumn Header="Try" DisplayMemberBinding="{Binding Num}"/>
+								<GridViewColumn Header="Number" DisplayMemberBinding="{Binding Number}"/>
+								<GridViewColumn Header="Bulls" DisplayMemberBinding="{Binding Bulls}"/>
+								<GridViewColumn Header="Cows" DisplayMemberBinding="{Binding Cows}"/>
+								<!--<GridViewColumn Header="Button">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<Button>Button Text</Button>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>-->
+							</GridView>
+						</Setter.Value>
+					</Setter>
+				</Style>
 				<DataGrid x:Key="myDataGrid" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*">
 					<DataGrid.Columns>
 						<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
@@ -35,15 +54,43 @@
 				<RowDefinition/>
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
-			<TextBox Grid.ColumnSpan="2" Margin="5" FontSize="20" PreviewTextInput="textbox_OnlyNumeric"
-					 PreviewKeyDown="textbox_restrictSpace" MaxLength="4" Name="textboxNumber"></TextBox>
+			<StackPanel Orientation="Horizontal" Margin="5">
+				<StackPanel.Resources>
+					<Style TargetType="TextBox">
+						<Setter Property="Width" Value="50"></Setter>
+						<Setter Property="Width" Value="50"></Setter>
+						<Setter Property="FontSize" Value="20"></Setter>
+						<Setter Property="MaxLength" Value="1"></Setter>
+						<Setter Property="Margin" Value="2"></Setter>
+						<Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+						<EventSetter Event="PreviewTextInput" Handler="textbox_OnlyNumeric"></EventSetter>
+						<EventSetter Event="PreviewKeyDown" Handler="textbox_PreviewKeyDown"></EventSetter>
+						<EventSetter Event="TextChanged" Handler="textbox_TextChanged"></EventSetter>
+						<EventSetter Event="GotMouseCapture" Handler="textbox_GotMouseCapture"></EventSetter>
+						<EventSetter Event="GotKeyboardFocus" Handler="textbox_GotKeyboardFocus"></EventSetter>
+						<EventSetter Event="GotFocus" Handler="textbox_GotFocus"></EventSetter>
+					</Style>
+				</StackPanel.Resources>
+				<TextBox Name="textboxNum1"></TextBox>
+				<TextBox Name="textboxNum2"></TextBox>
+				<TextBox Name="textboxNum3"></TextBox>
+				<TextBox Name="textboxNum4"></TextBox>
+			</StackPanel>
+			<!--<TextBox Grid.ColumnSpan="2" Margin="5" FontSize="20" PreviewTextInput="textbox_OnlyNumeric"
+					 PreviewKeyDown="textbox_restrictSpace" MaxLength="4" Name="textboxNumber"></TextBox>-->
 			<Button Grid.Column="1" Click="Button_Click" Name="btnStart">Start</Button>
-			
-			
-			<ContentControl Content="{StaticResource myDataGrid}" Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="10"/>
-		
-			<ContentControl Content="{StaticResource myDataGrid}" Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10"/>
-			
+
+			<DataGrid FontSize="17" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*"
+					  Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="10">
+				<DataGrid.Columns>
+					<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
+					<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>
+					<DataGridTextColumn Header="Bulls"  Binding="{Binding Bulls}"/>
+					<DataGridTextColumn Header="Cows"  Binding="{Binding Cows}"/>
+				</DataGrid.Columns>
+			</DataGrid>
+			<ListBox FontSize="26"  Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10"/>
+
 		</Grid>
     </DockPanel>
 </Window>

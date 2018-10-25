@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,27 +24,42 @@ namespace Bulls_and_cows
 	{
 		bool isStarted = false;
 		string answerNumber;
+		BindingList<Try> tryList;
 		public MainWindow()
 		{
 			InitializeComponent();
+			tryList = new BindingList<Try>();
+			playerDataGrid.ItemsSource = tryList;
+			focusOnFirst();
 		}
 		// PreviewTextInput event to make numeric textbox
 		private void textbox_OnlyNumeric(object sender, TextCompositionEventArgs e)
 		{
-			e.Handled = IsStringNumeric(e.Text);
+			e.Handled = !IsStringNumeric(e.Text);
 		}
 
 		// check string has numbers
 		bool IsStringNumeric(string str)
 		{
-			return Regex.IsMatch(str, "[^0-9]+");
+			return Regex.IsMatch(str, "^[0-9]+$");
 		}
 
 		// PreviewKeyDown event to restrict space key because of PreviewTextInput doesn't catch space
-		private void textbox_restrictSpace(object sender, KeyEventArgs e)
+		private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Space)
+			{
 				e.Handled = true;
+			}
+			else if (e.Key == Key.Enter)
+			{
+				btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+			}
+			else if (e.Key == Key.Back && (sender as TextBox).Text == "" && !e.IsRepeat)
+			{
+				myMoveFocus(FocusNavigationDirection.Previous);
+				e.Handled = true;
+			}
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -60,16 +76,24 @@ namespace Bulls_and_cows
 		{
 			bulls = 0;
 			cows = 0;
-			for (int i = 0; i < textboxNumber.Text.Length; i++)
+			string textboxNumber = getTextboxNumberValue();
+			if(!IsStringNumeric(textboxNumber))
 			{
-				if (answerNumber[i] == textboxNumber.Text[i])
+				MessageBox.Show("Number format error", "Error");
+				return;
+			}
+
+			for (int i = 0; i < textboxNumber.Length; i++)
+			{
+				if (answerNumber[i] == textboxNumber[i])
 					bulls++;
-				else if (answerNumber.Contains(textboxNumber.Text[i]))
+				else if (answerNumber.Contains(textboxNumber[i]))
 					cows++;
 			}
 			tries++;
-			playerDataGrid.Items.Add(new Try { Num = tries, Number = textboxNumber.Text, Bulls= bulls,  Cows=cows });
-			playerDataGrid.ScrollIntoView(playerDataGrid.Items[playerDataGrid.Items.Count-1]);
+			tryList.Add(new Try { Num = tries, Number = textboxNumber, Bulls= bulls,  Cows=cows });
+			//	playerDataGrid.ScrollIntoView(playerDataGrid.Items[playerDataGrid.Items.Count-1]);
+			focusOnFirst();
 
 			if(bulls == answerNumber.Length)
 			{
@@ -79,11 +103,16 @@ namespace Bulls_and_cows
 			}
 		}
 
+		string getTextboxNumberValue()
+		{
+			return textboxNum1.Text + textboxNum2.Text + textboxNum3.Text + textboxNum4.Text;
+		}
+
 		private void Start()
 		{
 			answerNumber = "";
 			tries = 0;
-			playerDataGrid.Items.Clear();
+			tryList.Clear();
 			generateNumber();
 			isStarted = true;
 			btnStart.Content = "Try";
@@ -106,6 +135,61 @@ namespace Bulls_and_cows
 		private void MenuItemExit_Click(object sender, RoutedEventArgs e)
 		{
 			Close();
+		}
+
+		private void textbox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			TextBox textBox = (sender as TextBox);
+			if (textBox.Text != "" && !textBox.Name.Contains('4'))
+			{
+				myMoveFocus(FocusNavigationDirection.Next);
+				setTextSelection(getFocusedControl() as TextBox);
+			}
+			else if (textBox.Text == "" && !textBox.Name.Contains('1'))
+			{
+				myMoveFocus(FocusNavigationDirection.Previous);
+				setTextSelection(getFocusedControl() as TextBox);
+			}
+		}
+		void myMoveFocus(FocusNavigationDirection fnd)
+		{
+			TraversalRequest tRequest = new TraversalRequest(fnd);
+			UIElement keyboardFocus = getFocusedControl();
+
+			if (keyboardFocus != null)
+			{
+				keyboardFocus.MoveFocus(tRequest);
+			}
+		}
+		UIElement getFocusedControl()
+		{
+			return Keyboard.FocusedElement as UIElement;
+		}
+		
+		void focusOnFirst()
+		{
+			textboxNum1.Focus();
+			setTextSelection(textboxNum1);
+		}
+		void setTextSelection(TextBox control)
+		{
+			control.SelectAll();
+		}
+
+		private void textbox_GotMouseCapture(object sender, MouseEventArgs e)
+		{
+			// TODO fix
+			setTextSelection(sender as TextBox);
+		}
+
+		private void textbox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+		{
+			setTextSelection(sender as TextBox);
+		}
+
+		private void textbox_GotFocus(object sender, RoutedEventArgs e)
+		{
+			(sender as TextBox).CaptureMouse();
 		}
 	}
 }

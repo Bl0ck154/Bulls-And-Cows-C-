@@ -12,6 +12,9 @@ namespace Bulls_and_cows
 		public string Number { get; set; }
 		public int Bulls { get; set; }
 		public int Cows { get; set; }
-		
+		public override string ToString()
+		{
+			return Num + ".  " + Number + " - " + Bulls + " - " + Cows;
+		}
 	}
 }
