@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bulls_and_cows"
         mc:Ignorable="d"
-        Title="Быки и коровы" Height="450" Width="600">
+		WindowStartupLocation="CenterScreen"
+        Title="Быки и коровы" Height="450" Width="600" MinHeight="300" MinWidth="300">
     <DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="File">
-				<MenuItem Header="New game" ></MenuItem>
-				<MenuItem Header="Find online game"></MenuItem>
+				<MenuItem Header="New game" Click="MenuItemNewGame_Click"></MenuItem>
+				<MenuItem Header="Find online game" Click="MenuItemFind_Click"></MenuItem>
+				<MenuItem Header="Connect by IP" Click="MenuItemConnectIP_Click"></MenuItem>
 				<Separator/>
 				<MenuItem Header="Exit" Click="MenuItemExit_Click"></MenuItem>
 			</MenuItem>
@@ -89,8 +91,19 @@
 					<DataGridTextColumn Header="Cows"  Binding="{Binding Cows}"/>
 				</DataGrid.Columns>
 			</DataGrid>
-			<ListBox FontSize="26"  Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10"/>
+			<DataGrid FontSize="17" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*"
+					  Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10" IsEnabled="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
+					<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>
+					<DataGridTextColumn Header="Bulls"  Binding="{Binding Bulls}"/>
+					<DataGridTextColumn Header="Cows"  Binding="{Binding Cows}"/>
+				</DataGrid.Columns>
+			</DataGrid>
 
+			<StatusBar Grid.Row="2" Grid.ColumnSpan="2">
+				Timer: <TextBlock Name="textTimer">0</TextBlock>
+			</StatusBar>
 		</Grid>
     </DockPanel>
 </Window>

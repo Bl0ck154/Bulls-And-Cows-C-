@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bulls and cows", "Bulls and cows\Bulls and cows.csproj", "{50761C7B-2358-4CA7-BB09-39FD6608ACB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "game_server", "game_server\game_server.csproj", "{55021612-826E-4CA9-8A65-796E2B514E68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{50761C7B-2358-4CA7-BB09-39FD6608ACB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50761C7B-2358-4CA7-BB09-39FD6608ACB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50761C7B-2358-4CA7-BB09-39FD6608ACB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55021612-826E-4CA9-8A65-796E2B514E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55021612-826E-4CA9-8A65-796E2B514E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55021612-826E-4CA9-8A65-796E2B514E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55021612-826E-4CA9-8A65-796E2B514E68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
