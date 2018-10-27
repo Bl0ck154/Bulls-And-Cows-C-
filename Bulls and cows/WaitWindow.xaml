@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bulls_and_cows"
-        mc:Ignorable="d" FontSize="22"
-		WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" FontSize="32" WindowStyle="ToolWindow"
+		WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         Title="Waiting connection" Height="150" Width="200">
     <Grid>
 		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Name="text">...</TextBlock>

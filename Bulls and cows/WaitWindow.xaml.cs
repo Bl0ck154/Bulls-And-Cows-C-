@@ -24,7 +24,7 @@ namespace Bulls_and_cows
 		{
 			InitializeComponent();
 			DispatcherTimer timer = new DispatcherTimer();
-			timer.Interval = new TimeSpan(0, 0, 1);
+			timer.Interval = new TimeSpan(0, 0, 0, 0, 200); // 200 milliseconds
 			timer.Tick += Timer_Tick;
 			timer.Start();
 		}

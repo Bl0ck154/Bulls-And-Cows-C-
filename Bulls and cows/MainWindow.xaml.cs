@@ -31,7 +31,8 @@ namespace Bulls_and_cows
 		DateTime startTime;
 		DispatcherTimer dispatcherTimer;
 		TcpClient tcpClientOpponent;
-		public bool isConnected { get { return tcpClientOpponent.Connected; } }
+		public bool isConnected { get { return (tcpClientOpponent!= null && tcpClientOpponent.Connected); } }
+		bool opponentIsReady = false;
 
 		public MainWindow()
 		{
@@ -74,11 +75,57 @@ namespace Bulls_and_cows
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (!isStarted)
-				Start();
+				BtnStart();
 			else
 				Try();
 		}
-		
+		const byte readyPacket = 234;
+		private void BtnStart()
+		{
+			tryList.Clear();
+			if (isConnected)
+			{
+				string number = getTextboxNumberValue();
+				if (number.Length < 4)
+				{
+					MessageBox.Show("Incorrect number");
+					return;
+				}
+
+				answerNumber = new HiddenNumber(number);
+
+				//  одновременный старт
+				NetworkStream networkStream = tcpClientOpponent.GetStream();
+				networkStream.Write(new byte[] { readyPacket }, 0, 1);
+			//	networkStream.Close();
+
+				if (opponentIsReady)
+					StartGame();
+			}
+			else
+			{
+				SingleGameStart();
+			}
+
+		}
+
+		void SingleGameStart()
+		{
+			generateNumber();
+			StartGame();
+		}
+
+		void StartGame()
+		{
+			isStarted = true;
+			btnStart.Content = "Try";
+			startTime = DateTime.Now;
+			dispatcherTimer = new DispatcherTimer();
+			dispatcherTimer.Tick += DispatcherTimer_Tick;
+			dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+			dispatcherTimer.Start();
+		}
+
 		int tries = 0;
 		private void Try()
 		{
@@ -91,28 +138,35 @@ namespace Bulls_and_cows
 
 			if(isConnected)
 			{
-				NetworkStream networkStream = tcpClientOpponent.GetStream();
-				byte[] data = Encoding.Unicode.GetBytes(textboxNumber);
-				networkStream.Write(data, 0, data.Length);
-
-				data = new byte[256];
-				int bytes = 0;
-				do
+				try
 				{
-					bytes = networkStream.Read(data, 0, data.Length);
-				} while (networkStream.DataAvailable);
+					NetworkStream networkStream = tcpClientOpponent.GetStream();
+					byte[] data = Encoding.Unicode.GetBytes(textboxNumber);
+					networkStream.Write(data, 0, data.Length);
 
-				tryList.Add(new Try
-				{
-					Num = tries,
-					Number = textboxNumber,
-					Bulls = data[0],
-					Cows = data[1]
-				});
+					data = new byte[256];
+					int bytes = 0;
+					do
+					{
+						bytes = networkStream.Read(data, 0, data.Length);
+					} while (networkStream.DataAvailable);
 
-				if(data[0] == 4) // TOREDO
+					tryList.Add(new Try
+					{
+						Num = ++tries,
+						Number = textboxNumber,
+						Bulls = data[0],
+						Cows = data[1]
+					});
+
+					if (data[0] == 4) // TODO
+					{
+						congratilations();
+					}
+				}
+				catch (Exception ex)
 				{
-					congratilations();
+					MessageBox.Show(ex.ToString());
 				}
 			}
 			else
@@ -146,33 +200,6 @@ namespace Bulls_and_cows
 		string getTextboxNumberValue()
 		{
 			return textboxNum1.Text + textboxNum2.Text + textboxNum3.Text + textboxNum4.Text;
-		}
-
-		private void Start()
-		{
-			tryList.Clear();
-			if(isConnected)
-			{
-				string number = getTextboxNumberValue();
-				if(number.Length < 4)
-				{
-					MessageBox.Show("Incorrect number");
-					return;
-				}
-
-				answerNumber = new HiddenNumber(number);
-			}
-			else
-			{
-				generateNumber();
-			}
-			isStarted = true;
-			btnStart.Content = "Try";
-			startTime = DateTime.Now;
-			dispatcherTimer = new DispatcherTimer();
-			dispatcherTimer.Tick += DispatcherTimer_Tick;
-			dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-			dispatcherTimer.Start();
 		}
 
 		private void DispatcherTimer_Tick(object sender, EventArgs e)
@@ -232,7 +259,8 @@ namespace Bulls_and_cows
 
 		void focusOnFirst()
 		{
-			textboxNum1.Focus();
+			Keyboard.Focus(textboxNum1);
+		//	textboxNum1.Focus();
 			setTextSelection(textboxNum1);
 		}
 		void setTextSelection(TextBox control)
@@ -258,7 +286,7 @@ namespace Bulls_and_cows
 
 		private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
 		{
-			Start();
+			SingleGameStart();
 		}
 
 		private void MenuItemFind_Click(object sender, RoutedEventArgs e)
@@ -280,7 +308,7 @@ namespace Bulls_and_cows
 				do
 				{
 					int bytes = stream.Read(data, 0, data.Length);
-					response.Append(Encoding.UTF8.GetString(data, 0, bytes));
+					response.Append(Encoding.Unicode.GetString(data, 0, bytes));
 				}
 				while (stream.DataAvailable); // пока данные есть в потоке
 
@@ -298,25 +326,46 @@ namespace Bulls_and_cows
 			{
 				MessageBox.Show(ex.ToString());
 			}
+		}
 
+		void showOpponentsUIElements()
+		{
+			opponentDataGrid.IsEnabled = true;
+			textOnline.Text = "You playing online with: " + (tcpClientOpponent.Client.RemoteEndPoint as IPEndPoint).Address.ToString();
 		}
 
 		void waitForConnect()
 		{
-			TcpListener server = new TcpListener(IPAddress.Any, Config.RemotePort);
-
-			// запуск слушателя
-			server.Start();
-
-			while (true)
+			try
 			{
-				Console.WriteLine("Ожидание подключений... ");
+				TcpListener server = new TcpListener(IPAddress.Any, Config.RemotePort);
 
-				// получаем входящее подключение
-				TcpClient client = server.AcceptTcpClient();
-				Console.WriteLine("Подключен клиент. Выполнение запроса...");
+				server.Start();
 
-				//
+				WaitWindow waitWindow = new WaitWindow() { Owner = this };
+				Task task = new Task(() => {
+					while (tcpClientOpponent == null)
+					{
+						Console.WriteLine("Ожидание подключений... ");
+
+						tcpClientOpponent = server.AcceptTcpClient();
+						Console.WriteLine("Подключен клиент. Выполнение запроса...");
+
+						this.Dispatcher.Invoke(() => {
+							waitWindow.Close();
+							showOpponentsUIElements();
+							MessageBox.Show("Соедениние успешно.\nЗагадайте число и нажмите старт");
+							Task.Run(() => listenOpponent());
+						});
+					}
+				});
+				task.Start();
+				waitWindow.ShowDialog(); // TODO stop task when closed
+
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString());
 			}
 		}
 	
@@ -351,9 +400,17 @@ namespace Bulls_and_cows
 			{
 				MessageBox.Show("Соедениние успешно.\nЗагадайте число и нажмите старт");
 				Task.Run(()=>listenOpponent());
+				showOpponentsUIElements();
 			}
 			
 			return true;
+		}
+
+		void opponentReady()
+		{
+			opponentIsReady = true;
+			if(answerNumber != null)
+				StartGame();
 		}
 
 		private void listenOpponent()
@@ -366,26 +423,51 @@ namespace Bulls_and_cows
 					StringBuilder response = new StringBuilder();
 					NetworkStream stream = tcpClientOpponent.GetStream();
 
+					bool receivedReady = false;
+					int bytes;
 					do
 					{
-						int bytes = stream.Read(data, 0, data.Length);
-						response.Append(Encoding.UTF8.GetString(data, 0, bytes));
+						bytes = stream.Read(data, 0, data.Length);
+
+						if(bytes == 1 && data[0] == readyPacket)
+							receivedReady = true;
+
+						if(opponentIsReady)
+							response.Append(Encoding.Unicode.GetString(data, 0, bytes));
+					} while (stream.DataAvailable);
+
+
+					if (receivedReady)
+					{
+						this.Dispatcher.Invoke(() => opponentReady());
+			//			stream.Close();
+						continue;
 					}
-					while (stream.DataAvailable);
+
+					if (!opponentIsReady || answerNumber == null)
+					{
+			//			stream.Close();
+						continue;
+					}
 
 					answerNumber.CheckMatches(response.ToString());
 
 					data = new byte[] { (byte)answerNumber.Bulls, (byte)answerNumber.Cows };
 					stream.Write(data, 0, data.Length);
-					stream.Close();
+					//		stream.Close();
 
-					opponentDataGrid.Items.Add(new Try
+					if (bytes == 2) // answer bulls - 0, cows - 1
+					{
+						continue;
+					}
+
+					this.Dispatcher.Invoke(() => opponentDataGrid.Items.Add(new Try
 					{
 						Num = answerNumber.Attempts,
 						Number = response.ToString(),
 						Bulls = answerNumber.Bulls,
 						Cows = answerNumber.Cows
-					});
+					}));
 				}
 			}
 			catch (Exception ex)
@@ -395,7 +477,16 @@ namespace Bulls_and_cows
 			finally
 			{
 
+				tcpClientOpponent?.Close();
+				tcpClientOpponent = null;
+				this.Dispatcher.Invoke(() => disableOpponentsUI());
 			}
+		}
+
+		void disableOpponentsUI()
+		{
+			textOnline.Text = "";
+			opponentDataGrid.IsEnabled = false;
 		}
 
 		public bool ValidateIPv4(string ipString)
@@ -418,7 +509,7 @@ namespace Bulls_and_cows
 
 		private void MenuItemConnectIP_Click(object sender, RoutedEventArgs e)
 		{
-			ConnectWindow connectWindow = new ConnectWindow();
+			ConnectWindow connectWindow = new ConnectWindow() { Owner = this };
 			bool connectResult = false;
 
 			if (connectWindow.ShowDialog() == true)
@@ -428,9 +519,9 @@ namespace Bulls_and_cows
 
 		}
 
-		void waitWindow()
+		private void MenuItemWait_Click(object sender, RoutedEventArgs e)
 		{
-			new WaitWindow().ShowDialog();
+			waitForConnect();
 		}
 	}
 }
