@@ -18,7 +18,13 @@
 				<MenuItem Header="Exit" Click="MenuItemExit_Click"></MenuItem>
 			</MenuItem>
 		</Menu>
-		<Grid Margin="10 0">
+		<StatusBar DockPanel.Dock="Bottom">
+			Timer:
+			<TextBlock Name="textTimer">0</TextBlock>
+			<Label Content="           "></Label>
+			<TextBlock Name="textOnline"></TextBlock>
+		</StatusBar>
+		<Grid Margin="5 2">
 			<Grid.Resources>
 				<Style TargetType="ListView">
 					<Setter Property="View">
@@ -57,34 +63,38 @@
 				<RowDefinition/>
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
-			<StackPanel Orientation="Horizontal" Margin="5">
-				<StackPanel.Resources>
+			<Grid Margin="5" Width="220">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<Grid.Resources>
 					<Style TargetType="TextBox">
-						<Setter Property="Width" Value="50"></Setter>
-						<Setter Property="Width" Value="50"></Setter>
 						<Setter Property="FontSize" Value="20"></Setter>
 						<Setter Property="MaxLength" Value="1"></Setter>
 						<Setter Property="Margin" Value="2"></Setter>
 						<Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
-						<EventSetter Event="PreviewTextInput" Handler="textbox_OnlyNumeric"></EventSetter>
+						<EventSetter Event="PreviewTextInput" Handler="textbox_PreviewTextInput"></EventSetter>
 						<EventSetter Event="PreviewKeyDown" Handler="textbox_PreviewKeyDown"></EventSetter>
 						<EventSetter Event="TextChanged" Handler="textbox_TextChanged"></EventSetter>
 						<EventSetter Event="GotMouseCapture" Handler="textbox_GotMouseCapture"></EventSetter>
 						<EventSetter Event="GotKeyboardFocus" Handler="textbox_GotKeyboardFocus"></EventSetter>
 						<EventSetter Event="GotFocus" Handler="textbox_GotFocus"></EventSetter>
 					</Style>
-				</StackPanel.Resources>
-				<TextBox Name="textboxNum1"></TextBox>
-				<TextBox Name="textboxNum2"></TextBox>
-				<TextBox Name="textboxNum3"></TextBox>
-				<TextBox Name="textboxNum4"></TextBox>
-			</StackPanel>
+				</Grid.Resources>
+				<TextBox Name="textboxNum1" Grid.Column="0"></TextBox>
+				<TextBox Name="textboxNum2" Grid.Column="1"></TextBox>
+				<TextBox Name="textboxNum3" Grid.Column="2"></TextBox>
+				<TextBox Name="textboxNum4" Grid.Column="3"></TextBox>
+			</Grid>
 			<!--<TextBox Grid.ColumnSpan="2" Margin="5" FontSize="20" PreviewTextInput="textbox_OnlyNumeric"
 					 PreviewKeyDown="textbox_restrictSpace" MaxLength="4" Name="textboxNumber"></TextBox>-->
 			<Button Grid.Column="1" Click="Button_Click" Name="btnStart">Start</Button>
 
 			<DataGrid FontSize="17" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*"
-					  Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="10">
+					  Name="playerDataGrid" Grid.Row="1" Grid.Column="0" Margin="6">
 				<DataGrid.Columns>
 					<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
 					<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>
@@ -93,7 +103,7 @@
 				</DataGrid.Columns>
 			</DataGrid>
 			<DataGrid FontSize="17" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*"
-					  Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="10" IsEnabled="False">
+					  Name="opponentDataGrid" Grid.Row="1" Grid.Column="1" Margin="6" IsEnabled="False">
 				<DataGrid.Columns>
 					<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
 					<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>
@@ -102,11 +112,6 @@
 				</DataGrid.Columns>
 			</DataGrid>
 
-			<StatusBar Grid.Row="2" Grid.ColumnSpan="2">
-				Timer: <TextBlock Name="textTimer">0</TextBlock>
-				<Label Content="           "></Label>
-				<TextBlock Name="textOnline"></TextBlock>
-			</StatusBar>
 		</Grid>
-    </DockPanel>
+	</DockPanel>
 </Window>

@@ -41,11 +41,19 @@ namespace Bulls_and_cows
 			tryList = new BindingList<Try>();
 			playerDataGrid.ItemsSource = tryList;
 			btnStart.Focus();
+			
 		}
-		// PreviewTextInput event to make numeric textbox
-		private void textbox_OnlyNumeric(object sender, TextCompositionEventArgs e)
+		
+		private void textbox_PreviewTextInput(object sender, TextCompositionEventArgs e)
 		{
-			e.Handled = !IsStringNumeric(e.Text);
+			// numeric textbox || avoid to repeating digits
+			e.Handled = !IsStringNumeric(e.Text) || checkForRepeats(sender as TextBox, e.Text);
+		}
+
+		bool checkForRepeats(TextBox sender, string text)
+		{
+			// TODO better way
+			return getTextboxNumberValue().Contains(text);
 		}
 
 		// check string has numbers
@@ -60,10 +68,6 @@ namespace Bulls_and_cows
 			if (e.Key == Key.Space)
 			{
 				e.Handled = true;
-			}
-			else if (e.Key == Key.Enter)
-			{
-				btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 			}
 			else if (e.Key == Key.Back && (sender as TextBox).Text == "" && !e.IsRepeat)
 			{
@@ -130,7 +134,7 @@ namespace Bulls_and_cows
 		private void Try()
 		{
 			string textboxNumber = getTextboxNumberValue();
-			if (!IsStringNumeric(textboxNumber))
+			if (!IsStringNumeric(textboxNumber) || textboxNumber.Length < answerNumber.Length)
 			{
 				MessageBox.Show("Number format error", "Error");
 				return;
@@ -259,8 +263,7 @@ namespace Bulls_and_cows
 
 		void focusOnFirst()
 		{
-			Keyboard.Focus(textboxNum1);
-		//	textboxNum1.Focus();
+			textboxNum1.Focus();
 			setTextSelection(textboxNum1);
 		}
 		void setTextSelection(TextBox control)
