@@ -58,6 +58,7 @@
     <Compile Include="ConnectWindow.xaml.cs">
       <DependentUpon>ConnectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="HiddenNumber.cs" />
     <Compile Include="Try.cs" />
     <Compile Include="WaitWindow.xaml.cs">
       <DependentUpon>WaitWindow.xaml</DependentUpon>

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Bulls_and_cows"
         mc:Ignorable="d" FontSize="22"
 		WindowStartupLocation="CenterScreen"
-        Title="WaitWindow" Height="150" Width="200">
+        Title="Waiting connection" Height="150" Width="200">
     <Grid>
 		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Name="text">...</TextBlock>
     </Grid>
