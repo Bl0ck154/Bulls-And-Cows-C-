@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bulls_and_cows
 {
-	class Try
+	class Attempt
 	{
 		public int Num { get; set; }
 		public string Number { get; set; }

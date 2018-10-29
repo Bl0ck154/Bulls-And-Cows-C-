@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,33 +29,36 @@ namespace Bulls_and_cows
 	{
 		bool isStarted = false;
 		HiddenNumber answerNumber;
-		BindingList<Try> tryList;
+		BindingList<Attempt> tryList;
 		DateTime startTime;
 		DispatcherTimer dispatcherTimer;
 		TcpClient tcpClientOpponent;
 		public bool isConnected { get { return (tcpClientOpponent!= null && tcpClientOpponent.Connected); } }
 		bool opponentIsReady = false;
+		string enteredNumber = ""; // хранит в себе значения всех 4 текстбоксов
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			tryList = new BindingList<Try>();
+			tryList = new BindingList<Attempt>();
 			playerDataGrid.ItemsSource = tryList;
 			btnStart.Focus();
-			
 		}
 		
 		private void textbox_PreviewTextInput(object sender, TextCompositionEventArgs e)
 		{
-			// numeric textbox || avoid to repeating digits
-			e.Handled = !IsStringNumeric(e.Text) || checkForRepeats(sender as TextBox, e.Text);
+			// numeric textbox
+			e.Handled = !IsStringNumeric(e.Text);
+			if (!e.Handled)
+				(sender as TextBox).Text = "";
 		}
 
-		bool checkForRepeats(TextBox sender, string text)
+		bool findRepeats(string text)
 		{
 			// TODO better way
-			return getTextboxNumberValue().Contains(text);
+			var result = text.GroupBy(c => c).Where(c => c.Count() > 1);
+			return result.Count() > 0;
 		}
 
 		// check string has numbers
@@ -65,11 +70,27 @@ namespace Bulls_and_cows
 		// PreviewKeyDown event to restrict space key because of PreviewTextInput doesn't catch space
 		private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
+			TextBox textBox = (sender as TextBox);
+
 			if (e.Key == Key.Space)
 			{
 				e.Handled = true;
 			}
-			else if (e.Key == Key.Back && (sender as TextBox).Text == "" && !e.IsRepeat)
+			else if(e.Key == Key.Left || e.Key == Key.Up)
+			{
+				if (!textBox.Name.Contains('1'))
+				{
+					myMoveFocus(FocusNavigationDirection.Previous);
+				}
+			}
+			else if(e.Key == Key.Right || e.Key == Key.Down)
+			{
+				if (!textBox.Name.Contains('4'))
+				{
+					myMoveFocus(FocusNavigationDirection.Next);
+				}
+			}
+			else if (e.Key == Key.Back && textBox.Text == "" && !e.IsRepeat)
 			{
 				myMoveFocus(FocusNavigationDirection.Previous);
 				e.Handled = true;
@@ -92,7 +113,7 @@ namespace Bulls_and_cows
 				string number = getTextboxNumberValue();
 				if (number.Length < 4)
 				{
-					MessageBox.Show("Incorrect number");
+					MessageBox.Show("Вы должен ввести 4 цифры!");
 					return;
 				}
 
@@ -101,10 +122,17 @@ namespace Bulls_and_cows
 				//  одновременный старт
 				NetworkStream networkStream = tcpClientOpponent.GetStream();
 				networkStream.Write(new byte[] { readyPacket }, 0, 1);
-			//	networkStream.Close();
+				//	networkStream.Close();
 
 				if (opponentIsReady)
+				{
 					StartGame();
+				}
+				else
+				{
+					WaitWindow waitWindow = new WaitWindow() { Owner = this, Title = "Please wait your opponent" };
+					waitWindow.ShowDialog();
+				}
 			}
 			else
 			{
@@ -139,6 +167,11 @@ namespace Bulls_and_cows
 				MessageBox.Show("Number format error", "Error");
 				return;
 			}
+			if(findRepeats(textboxNumber))
+			{
+				MessageBox.Show("Repetition found in the number", "Error");
+				return;
+			}
 
 			if(isConnected)
 			{
@@ -155,7 +188,7 @@ namespace Bulls_and_cows
 						bytes = networkStream.Read(data, 0, data.Length);
 					} while (networkStream.DataAvailable);
 
-					tryList.Add(new Try
+					tryList.Add(new Attempt
 					{
 						Num = ++tries,
 						Number = textboxNumber,
@@ -176,7 +209,7 @@ namespace Bulls_and_cows
 			else
 			{
 				answerNumber.CheckMatches(textboxNumber);
-				tryList.Add(new Try
+				tryList.Add(new Attempt
 				{
 					Num = answerNumber.Attempts,
 					Number = textboxNumber,
@@ -196,6 +229,11 @@ namespace Bulls_and_cows
 		void congratilations()
 		{
 			MessageBox.Show("Congratilations! You win!", "You win!");
+			StopGame();
+		}
+
+		void StopGame()
+		{
 			isStarted = false;
 			btnStart.Content = "Start";
 			dispatcherTimer.Stop();
@@ -238,12 +276,6 @@ namespace Bulls_and_cows
 			if (textBox.Text != "" && !textBox.Name.Contains('4'))
 			{
 				myMoveFocus(FocusNavigationDirection.Next);
-				setTextSelection(getFocusedControl() as TextBox);
-			}
-			else if (textBox.Text == "" && !textBox.Name.Contains('1'))
-			{
-				myMoveFocus(FocusNavigationDirection.Previous);
-				setTextSelection(getFocusedControl() as TextBox);
 			}
 		}
 		void myMoveFocus(FocusNavigationDirection fnd)
@@ -254,6 +286,7 @@ namespace Bulls_and_cows
 			if (keyboardFocus != null)
 			{
 				keyboardFocus.MoveFocus(tRequest);
+				setTextSelection(keyboardFocus as TextBox);
 			}
 		}
 		UIElement getFocusedControl()
@@ -271,20 +304,9 @@ namespace Bulls_and_cows
 			control.SelectAll();
 		}
 
-		private void textbox_GotMouseCapture(object sender, MouseEventArgs e)
-		{
-			// TODO fix
-			setTextSelection(sender as TextBox);
-		}
-
 		private void textbox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
 		{
 			setTextSelection(sender as TextBox);
-		}
-
-		private void textbox_GotFocus(object sender, RoutedEventArgs e)
-		{
-			(sender as TextBox).CaptureMouse();
 		}
 
 		private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
@@ -349,16 +371,14 @@ namespace Bulls_and_cows
 				Task task = new Task(() => {
 					while (tcpClientOpponent == null)
 					{
-						Console.WriteLine("Ожидание подключений... ");
+					//	Console.WriteLine("Ожидание подключений... ");
 
 						tcpClientOpponent = server.AcceptTcpClient();
-						Console.WriteLine("Подключен клиент. Выполнение запроса...");
+					//	Console.WriteLine("Подключен клиент. Выполнение запроса...");
 
 						this.Dispatcher.Invoke(() => {
 							waitWindow.Close();
-							showOpponentsUIElements();
-							MessageBox.Show("Соедениние успешно.\nЗагадайте число и нажмите старт");
-							Task.Run(() => listenOpponent());
+							connectionSuccessful();
 						});
 					}
 				});
@@ -401,19 +421,42 @@ namespace Bulls_and_cows
 
 			if (tcpClientOpponent.Connected)
 			{
-				MessageBox.Show("Соедениние успешно.\nЗагадайте число и нажмите старт");
-				Task.Run(()=>listenOpponent());
-				showOpponentsUIElements();
+				connectionSuccessful();
 			}
 			
 			return true;
 		}
 
+		void connectionSuccessful()
+		{
+			MessageBox.Show("Соедениние успешно.\nЗагадайте число и нажмите старт");
+			Task.Run(() => listenOpponent());
+			showOpponentsUIElements();
+			Task.Run(() => checkConnection());
+		}
+
 		void opponentReady()
 		{
 			opponentIsReady = true;
-			if(answerNumber != null)
+			if (answerNumber != null)
+			{
+				foreach (Window item in Application.Current.Windows)
+				{
+					if (item is WaitWindow)
+						item.Close();
+				}
 				StartGame();
+			}
+		}
+
+		private void checkConnection()
+		{
+			while (tcpClientOpponent.Connected)
+			{
+				Thread.Sleep(100);
+			}
+			MessageBox.Show("It seems your opponent left the game.");
+			this.Dispatcher.Invoke(() => StopGameOnline());
 		}
 
 		private void listenOpponent()
@@ -464,7 +507,7 @@ namespace Bulls_and_cows
 						continue;
 					}
 
-					this.Dispatcher.Invoke(() => opponentDataGrid.Items.Add(new Try
+					this.Dispatcher.Invoke(() => opponentDataGrid.Items.Add(new Attempt
 					{
 						Num = answerNumber.Attempts,
 						Number = response.ToString(),
@@ -473,17 +516,26 @@ namespace Bulls_and_cows
 					}));
 				}
 			}
+			catch (System.IO.IOException ex)
+			{
+				MessageBox.Show("It seems your opponent left the game.");
+			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.ToString());
 			}
 			finally
 			{
-
 				tcpClientOpponent?.Close();
 				tcpClientOpponent = null;
-				this.Dispatcher.Invoke(() => disableOpponentsUI());
+				this.Dispatcher.Invoke(() => StopGameOnline());
 			}
+		}
+
+		void StopGameOnline()
+		{
+			disableOpponentsUI();
+			StopGame();
 		}
 
 		void disableOpponentsUI()
