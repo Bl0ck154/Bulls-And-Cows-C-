@@ -29,23 +29,28 @@ namespace Bulls_and_cows
 	{
 		bool isStarted = false;
 		HiddenNumber answerNumber;
-		BindingList<Attempt> tryList;
 		DateTime startTime;
 		DispatcherTimer dispatcherTimer;
 		TcpClient tcpClientOpponent;
 		public bool isConnected { get { return (tcpClientOpponent!= null && tcpClientOpponent.Connected); } }
 		bool opponentIsReady = false;
 		bool isClosed = false; // window was closed
+		int triesCount = 0;
 
 		public MainWindow()
 		{
 			InitializeComponent();
-
-			tryList = new BindingList<Attempt>();
-			playerDataGrid.ItemsSource = tryList;
+			
 			btnStart.Focus();
 
+			this.KeyDown += MainWindow_KeyDown;
 			this.Closing += MainWindow_Closing;
+		}
+
+		private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter && !e.IsRepeat)
+				btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 		}
 
 		private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -114,7 +119,10 @@ namespace Bulls_and_cows
 		const byte readyPacket = 234;
 		private void BtnStart()
 		{
-			tryList.Clear();
+			playerDataGrid.Items.Clear();
+			opponentDataGrid.Items.Clear();
+			clearTextboxes();
+			triesCount = 0;
 			if (isConnected)
 			{
 				string number = getTextboxNumberValue();
@@ -148,6 +156,11 @@ namespace Bulls_and_cows
 
 		}
 
+		void clearTextboxes()
+		{
+			textboxNum1.Text = textboxNum2.Text = textboxNum3.Text = textboxNum4.Text = "";
+		}
+
 		void SingleGameStart()
 		{
 			generateNumber();
@@ -165,7 +178,6 @@ namespace Bulls_and_cows
 			dispatcherTimer.Start();
 		}
 
-		int tries = 0;
 		private void Try()
 		{
 			string textboxNumber = getTextboxNumberValue();
@@ -195,13 +207,8 @@ namespace Bulls_and_cows
 						bytes = networkStream.Read(data, 0, data.Length);
 					} while (networkStream.DataAvailable);
 
-					tryList.Add(new Attempt
-					{
-						Num = ++tries,
-						Number = textboxNumber,
-						Bulls = data[0],
-						Cows = data[1]
-					});
+					AddAttemptToDataGrid(playerDataGrid, ++triesCount, textboxNumber,
+						data[0], data[1]);
 
 					if (data[0] == 4) // TODO
 					{
@@ -216,14 +223,8 @@ namespace Bulls_and_cows
 			else
 			{
 				answerNumber.CheckMatches(textboxNumber);
-				tryList.Add(new Attempt
-				{
-					Num = answerNumber.Attempts,
-					Number = textboxNumber,
-					Bulls = answerNumber.Bulls,
-					Cows = answerNumber.Cows
-				});
-				//	playerDataGrid.ScrollIntoView(playerDataGrid.Items[playerDataGrid.Items.Count-1]);
+				AddAttemptToDataGrid(playerDataGrid, answerNumber.Attempts, textboxNumber,
+					answerNumber.Bulls, answerNumber.Cows);
 				
 				if (answerNumber.Bulls == answerNumber.Length)
 				{
@@ -231,6 +232,20 @@ namespace Bulls_and_cows
 				}
 			}
 			focusOnFirst();
+		}
+
+		Attempt AddAttemptToDataGrid(DataGrid dataGrid, int attemptNumber, string number, int bulls, int cows)
+		{
+			Attempt attempt = new Attempt
+			{
+				Num = attemptNumber,
+				Number = number,
+				Bulls = bulls,
+				Cows = cows
+			};
+			dataGrid.Items.Add(attempt);
+			dataGrid.ScrollIntoView(attempt);
+			return attempt;
 		}
 
 		void congratilations()
@@ -318,6 +333,7 @@ namespace Bulls_and_cows
 
 		private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
 		{
+			// TODO better
 			SingleGameStart();
 		}
 
