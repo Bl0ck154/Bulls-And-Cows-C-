@@ -35,7 +35,7 @@ namespace Bulls_and_cows
 		TcpClient tcpClientOpponent;
 		public bool isConnected { get { return (tcpClientOpponent!= null && tcpClientOpponent.Connected); } }
 		bool opponentIsReady = false;
-		string enteredNumber = ""; // хранит в себе значения всех 4 текстбоксов
+		bool isClosed = false; // window was closed
 
 		public MainWindow()
 		{
@@ -44,8 +44,15 @@ namespace Bulls_and_cows
 			tryList = new BindingList<Attempt>();
 			playerDataGrid.ItemsSource = tryList;
 			btnStart.Focus();
+
+			this.Closing += MainWindow_Closing;
 		}
-		
+
+		private void MainWindow_Closing(object sender, CancelEventArgs e)
+		{
+			isClosed = true;
+		}
+
 		private void textbox_PreviewTextInput(object sender, TextCompositionEventArgs e)
 		{
 			// numeric textbox
@@ -111,9 +118,9 @@ namespace Bulls_and_cows
 			if (isConnected)
 			{
 				string number = getTextboxNumberValue();
-				if (number.Length < 4)
+				if (number.Length < 4 || findRepeats(number))
 				{
-					MessageBox.Show("Вы должен ввести 4 цифры!");
+					MessageBox.Show("Please enter 4 different numbers!");
 					return;
 				}
 
@@ -356,7 +363,8 @@ namespace Bulls_and_cows
 		void showOpponentsUIElements()
 		{
 			opponentDataGrid.IsEnabled = true;
-			textOnline.Text = "You playing online with: " + (tcpClientOpponent.Client.RemoteEndPoint as IPEndPoint).Address.ToString();
+			IPEndPoint client = (tcpClientOpponent.Client.RemoteEndPoint as IPEndPoint);
+			textOnline.Text = $"You playing online with: {client.Address}:{client.Port}";
 		}
 
 		void waitForConnect()
@@ -368,12 +376,13 @@ namespace Bulls_and_cows
 				server.Start();
 
 				WaitWindow waitWindow = new WaitWindow() { Owner = this };
-				Task task = new Task(() => {
+				Thread task = new Thread(() => {
 					while (tcpClientOpponent == null)
 					{
-					//	Console.WriteLine("Ожидание подключений... ");
+						//	Console.WriteLine("Ожидание подключений... ");
 
-						tcpClientOpponent = server.AcceptTcpClient();
+						try { tcpClientOpponent = server.AcceptTcpClient(); }
+						catch (Exception ex) { break; }
 					//	Console.WriteLine("Подключен клиент. Выполнение запроса...");
 
 						this.Dispatcher.Invoke(() => {
@@ -383,7 +392,8 @@ namespace Bulls_and_cows
 					}
 				});
 				task.Start();
-				waitWindow.ShowDialog(); // TODO stop task when closed
+				waitWindow.Closing += (sender, e) => { server.Stop(); }; 
+				waitWindow.ShowDialog();
 
 			}
 			catch (Exception ex)
@@ -391,7 +401,12 @@ namespace Bulls_and_cows
 				MessageBox.Show(ex.ToString());
 			}
 		}
-	
+
+		private void WaitWindow_Closing(object sender, CancelEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
 		public bool connectByIp(string IPPort)
 		{
 			string[] parts = IPPort.Split(':');
@@ -455,8 +470,11 @@ namespace Bulls_and_cows
 			{
 				Thread.Sleep(100);
 			}
-			MessageBox.Show("It seems your opponent left the game.");
-			this.Dispatcher.Invoke(() => StopGameOnline());
+			if (!isClosed && isStarted)
+			{
+				MessageBox.Show("It seems your opponent left the game.");
+				this.Dispatcher.Invoke(() => StopGameOnline());
+			}
 		}
 
 		private void listenOpponent()
@@ -502,7 +520,7 @@ namespace Bulls_and_cows
 					stream.Write(data, 0, data.Length);
 					//		stream.Close();
 
-					if (bytes == 2) // answer bulls - 0, cows - 1
+					if (bytes == 2) // answer first byte - bulls count, second - cows count
 					{
 						continue;
 					}
