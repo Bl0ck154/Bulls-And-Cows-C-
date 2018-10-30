@@ -323,20 +323,15 @@ namespace Bulls_and_cows
 
 		private void MenuItemFind_Click(object sender, RoutedEventArgs e)
 		{
-			const int port = 8888;
-			const string server = "127.0.0.1"; // TODO
-
 			try
 			{
 				TcpClient client = new TcpClient();
-				client.Connect(server, port);
+				client.Connect(Config.ServerIP, Config.RemotePort);
 
 				byte[] data = new byte[256];
 				StringBuilder response = new StringBuilder();
 				NetworkStream stream = client.GetStream();
-
-				//TODO Listening
-
+				
 				do
 				{
 					int bytes = stream.Read(data, 0, data.Length);
@@ -349,10 +344,9 @@ namespace Bulls_and_cows
 				// Закрываем потоки
 				stream.Close();
 				client.Close();
-			}
-			catch (SocketException ex)
-			{
-				MessageBox.Show($"{ex}", "SocketException");
+
+				// открываем окно ожидания подключения
+				waitForConnect();
 			}
 			catch (Exception ex)
 			{

@@ -10,14 +10,14 @@ namespace game_server
 {
 	class Program
 	{
-		const int port = 5678; // порт для прослушивания подключений
+		const int port = 7766; // порт для прослушивания подключений
 		static void Main(string[] args)
 		{
 			TcpListener server = null;
 			Queue<string> ClientsQueue = new Queue<string>();
 			try
 			{
-				IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+				IPAddress localAddr = IPAddress.Any;
 				server = new TcpListener(localAddr, port);
 
 				// запуск слушателя
@@ -29,19 +29,21 @@ namespace game_server
 
 					// получаем входящее подключение
 					TcpClient client = server.AcceptTcpClient();
-					Console.WriteLine("Подключен клиент. Выполнение запроса...");
+
+					IPEndPoint iPEndPoint = client.Client.LocalEndPoint as IPEndPoint;
+					string clientIPPort = $"{iPEndPoint.Address}:{iPEndPoint.Port}";
+					Console.WriteLine($"Подключен клиент {clientIPPort}. Выполнение запроса...");
 
 					if (ClientsQueue.Count == 0)
 					{
-						IPEndPoint iPEndPoint = client.Client.LocalEndPoint as IPEndPoint;
-						ClientsQueue.Enqueue($"{iPEndPoint.Address}:{iPEndPoint.Port}");
+						ClientsQueue.Enqueue(clientIPPort);
 					}
 					else
 					{
 						// получаем сетевой поток для чтения и записи
 						NetworkStream stream = client.GetStream();
 
-						byte[] data = Encoding.UTF8.GetBytes(ClientsQueue.Dequeue());
+						byte[] data = Encoding.Unicode.GetBytes(ClientsQueue.Dequeue());
 
 						// отправка сообщения
 						stream.Write(data, 0, data.Length);
@@ -51,9 +53,9 @@ namespace game_server
 					client.Close();
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				Console.WriteLine(e.Message);
+				Console.WriteLine(ex.Message);
 			}
 			finally
 			{

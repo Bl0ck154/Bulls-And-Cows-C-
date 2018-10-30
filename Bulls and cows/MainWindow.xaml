@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Bulls_and_cows"
         mc:Ignorable="d"
 		WindowStartupLocation="CenterScreen"
-        Title="Быки и коровы" Height="450" Width="600" MinHeight="300" MinWidth="300">
+        Title="Bull And Cows Game" Height="450" Width="600" MinHeight="300" MinWidth="300">
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="Menu" Width="190">
