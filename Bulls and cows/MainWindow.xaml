@@ -17,6 +17,9 @@
 				<Separator/>
 				<MenuItem Header="Exit" Click="MenuItemExit_Click"></MenuItem>
 			</MenuItem>
+			<MenuItem Header="Your Hidden Number" Name="MenuItem_YourNumber" Visibility="Hidden">
+				<MenuItem></MenuItem>
+			</MenuItem>
 		</Menu>
 		<StatusBar DockPanel.Dock="Bottom">
 			Timer:
