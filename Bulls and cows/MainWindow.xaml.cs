@@ -121,7 +121,6 @@ namespace Bulls_and_cows
 		{
 			playerDataGrid.Items.Clear();
 			opponentDataGrid.Items.Clear();
-			clearTextboxes();
 			triesCount = 0;
 			if (isConnected)
 			{
@@ -133,6 +132,9 @@ namespace Bulls_and_cows
 				}
 
 				answerNumber = new HiddenNumber(number);
+
+				(MenuItem_YourNumber.Items[0] as MenuItem).Header = number;
+				MenuItem_YourNumber.Visibility = Visibility.Visible;
 
 				//  одновременный старт
 				NetworkStream networkStream = tcpClientOpponent.GetStream();
@@ -148,6 +150,7 @@ namespace Bulls_and_cows
 					WaitWindow waitWindow = new WaitWindow() { Owner = this, Title = "Please wait your opponent" };
 					waitWindow.ShowDialog();
 				}
+				clearTextboxes();
 			}
 			else
 			{
@@ -258,7 +261,7 @@ namespace Bulls_and_cows
 		{
 			isStarted = false;
 			btnStart.Content = "Start";
-			dispatcherTimer.Stop();
+			dispatcherTimer?.Stop();
 		}
 
 		string getTextboxNumberValue()
@@ -570,6 +573,7 @@ namespace Bulls_and_cows
 		{
 			textOnline.Text = "";
 			opponentDataGrid.IsEnabled = false;
+			MenuItem_YourNumber.Visibility = Visibility.Hidden;
 		}
 
 		public bool ValidateIPv4(string ipString)
