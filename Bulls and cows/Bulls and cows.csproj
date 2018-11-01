@@ -61,6 +61,7 @@
     <Compile Include="ConnectWindow.xaml.cs">
       <DependentUpon>ConnectWindow.xaml</DependentUpon>
     </Compile>
+    <None Include="Game.cs" />
     <Compile Include="HiddenNumber.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="WaitWindow.xaml.cs">

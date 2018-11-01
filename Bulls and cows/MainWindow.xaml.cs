@@ -68,7 +68,6 @@ namespace Bulls_and_cows
 
 		bool findRepeats(string text)
 		{
-			// TODO better way
 			var result = text.GroupBy(c => c).Where(c => c.Count() > 1);
 			return result.Count() > 0;
 		}
@@ -133,8 +132,11 @@ namespace Bulls_and_cows
 
 				answerNumber = new HiddenNumber(number);
 
-				(MenuItem_YourNumber.Items[0] as MenuItem).Header = number;
-				MenuItem_YourNumber.Visibility = Visibility.Visible;
+				if (MenuItem_YourNumber.Items.Count > 0)
+				{
+					(MenuItem_YourNumber.Items[0] as MenuItem).Header = number;
+					MenuItem_YourNumber.Visibility = Visibility.Visible;
+				}
 
 				//  одновременный старт
 				NetworkStream networkStream = tcpClientOpponent.GetStream();
@@ -193,6 +195,14 @@ namespace Bulls_and_cows
 			{
 				MessageBox.Show("Repetition found in the number", "Error");
 				return;
+			}
+			if(playerDataGrid.Items.Count > 0) // check previous number
+			{
+				if((playerDataGrid.Items[playerDataGrid.Items.Count-1] as Attempt).Number == textboxNumber)
+				{
+					MessageBox.Show("Your previous number is the same", "Error");
+					return;
+				}
 			}
 
 			if(isConnected)
@@ -485,7 +495,7 @@ namespace Bulls_and_cows
 			}
 			if (!isClosed && isStarted)
 			{
-				MessageBox.Show("It seems your opponent left the game.");
+				opponentLeftMessage();
 				this.Dispatcher.Invoke(() => StopGameOnline());
 			}
 		}
@@ -549,7 +559,7 @@ namespace Bulls_and_cows
 			}
 			catch (System.IO.IOException ex)
 			{
-				MessageBox.Show("It seems your opponent left the game.");
+				opponentLeftMessage();
 			}
 			catch (Exception ex)
 			{
@@ -561,6 +571,12 @@ namespace Bulls_and_cows
 				tcpClientOpponent = null;
 				this.Dispatcher.Invoke(() => StopGameOnline());
 			}
+		}
+
+		void opponentLeftMessage()
+		{
+			// TODO fix double msg
+			MessageBox.Show("It seems your opponent left the game.");
 		}
 
 		void StopGameOnline()
