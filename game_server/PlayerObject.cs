@@ -37,7 +37,7 @@ namespace game_server
 				bool firstReadySent = false;
 				stream = client.GetStream();
 				byte[] data = new byte[256]; // буфер для получаемых данных
-				while (true)
+				while (client.Connected)
 				{
 					// если соперника нет, то ждем его появления
 					while (opponent == null)
@@ -111,6 +111,7 @@ namespace game_server
 				stream?.Close();
 				client?.Close();
 				ClientDisconnected(this);
+				opponent.client.Close();
 				opponent = null;
 			}
 		}

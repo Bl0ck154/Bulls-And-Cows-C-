@@ -127,7 +127,7 @@ namespace Bulls_and_cows
 				string number = getTextboxNumberValue();
 				if (number.Length < 4 || findRepeats(number))
 				{
-					MessageBox.Show("Please enter 4 different numbers!");
+					MessageBox.Show(this, "Please enter 4 different numbers!");
 					return;
 				}
 
@@ -196,19 +196,19 @@ namespace Bulls_and_cows
 			string textboxNumber = getTextboxNumberValue();
 			if (!IsStringNumeric(textboxNumber) || textboxNumber.Length < answerNumber.Length)
 			{
-				MessageBox.Show("Number format error", "Error");
+				MessageBox.Show(this, "Number format error", "Error");
 				return;
 			}
 			if(findRepeats(textboxNumber))
 			{
-				MessageBox.Show("Repetition found in the number", "Error");
+				MessageBox.Show(this, "Repetition found in the number", "Error");
 				return;
 			}
 			if(playerDataGrid.Items.Count > 0) // check previous number
 			{
 				if((playerDataGrid.Items[playerDataGrid.Items.Count-1] as Attempt).Number == textboxNumber)
 				{
-					MessageBox.Show("Your previous number is the same", "Error");
+					MessageBox.Show(this, "Your previous number is the same", "Error");
 					return;
 				}
 			}
@@ -238,7 +238,7 @@ namespace Bulls_and_cows
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show(ex.ToString());
+					MessageBox.Show(this, ex.ToString());
 				}
 			}
 			else
@@ -271,7 +271,7 @@ namespace Bulls_and_cows
 
 		void congratilations()
 		{
-			MessageBox.Show("Congratilations! You win!", "You win!");
+			MessageBox.Show(this, "Congratilations! You win!", "You win!");
 			StopGame();
 		}
 
@@ -404,7 +404,7 @@ namespace Bulls_and_cows
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.ToString());
+				MessageBox.Show(this, ex.ToString());
 			}
 		}
 		// TODO Waitwindow ready closing disable
@@ -447,7 +447,7 @@ namespace Bulls_and_cows
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.ToString());
+				MessageBox.Show(this, ex.ToString());
 			}
 		}
 
@@ -462,13 +462,13 @@ namespace Bulls_and_cows
 			string Ip = parts[0];
 			if (!ValidateIPv4(Ip) || parts.Length < 2)
 			{
-				MessageBox.Show("Incorrect IP address - " + Ip, "Error");
+				MessageBox.Show(this, "Incorrect IP address - " + Ip, "Error");
 				return false;
 			}
 			string port = parts[1];
 			if(!IsStringNumeric(port))
 			{
-				MessageBox.Show("Incorrect port - " + port, "Error");
+				MessageBox.Show(this, "Incorrect port - " + port, "Error");
 				return false;
 			}
 
@@ -479,7 +479,7 @@ namespace Bulls_and_cows
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.ToString());
+				MessageBox.Show(this, ex.ToString());
 				return false;
 			}
 
@@ -493,7 +493,7 @@ namespace Bulls_and_cows
 
 		void connectionSuccessful()
 		{
-			MessageBox.Show(this, "Соедениние успешно.\nЗагадайте число и нажмите старт");
+			MessageBox.Show(this, "Соединение успешно.\nЗагадайте число и нажмите старт");
 			Task.Run(() => listenOpponent());
 			showOpponentsUIElements();
 			Task.Run(() => checkConnection());
@@ -541,8 +541,10 @@ namespace Bulls_and_cows
 					do
 					{
 						bytes = stream.Read(data, 0, data.Length);
+						if (bytes == 0)
+							throw new Exception("Lost connect");
 
-						if(!opponentIsReady && bytes == 1 && data[0] == readyPacket)
+						if (!opponentIsReady && bytes == 1 && data[0] == readyPacket)
 							receivedReady = true;
 
 						if(opponentIsReady)
@@ -584,7 +586,7 @@ namespace Bulls_and_cows
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.ToString());
+				MessageBox.Show(this, ex.ToString());
 			}
 			finally
 			{
