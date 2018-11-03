@@ -36,6 +36,7 @@ namespace Bulls_and_cows
 		bool opponentIsReady = false;
 		bool isClosed = false; // window was closed
 		int triesCount = 0;
+		bool playingOnServer = false;
 
 		public MainWindow()
 		{
@@ -138,10 +139,17 @@ namespace Bulls_and_cows
 					MenuItem_YourNumber.Visibility = Visibility.Visible;
 				}
 
-				//  одновременный старт
 				NetworkStream networkStream = tcpClientOpponent.GetStream();
-				networkStream.Write(new byte[] { readyPacket }, 0, 1);
-				//	networkStream.Close();
+				if (!playingOnServer)
+				{
+					//  одновременный старт
+					networkStream.Write(new byte[] { readyPacket }, 0, 1);
+				}
+				else
+				{
+					byte[] data = Encoding.Unicode.GetBytes(number);
+					networkStream.Write(data, 0, data.Length);
+				}
 
 				if (opponentIsReady)
 				{
@@ -354,34 +362,52 @@ namespace Bulls_and_cows
 		{
 			try
 			{
-				TcpClient client = new TcpClient();
-				client.Connect(Config.ServerIP, Config.RemotePort);
-
-				byte[] data = new byte[256];
-				StringBuilder response = new StringBuilder();
-				NetworkStream stream = client.GetStream();
+				tcpClientOpponent = new TcpClient();
+				tcpClientOpponent.Connect(Config.ServerIP, Config.RemotePort);
 				
-				do
+				byte[] data = new byte[256];
+				NetworkStream stream = tcpClientOpponent.GetStream();
+				int bytes;
+
+				// open waitwindow to wait opponent
+				WaitWindow waitWindow = new WaitWindow() { Owner = this };
+				bool cancelation = true;
+				Task.Run(() =>
 				{
-					int bytes = stream.Read(data, 0, data.Length);
-					response.Append(Encoding.Unicode.GetString(data, 0, bytes));
-				}
-				while (stream.DataAvailable); // пока данные есть в потоке
+					try
+					{
+						do
+						{
+							bytes = stream.Read(data, 0, data.Length);
 
-				connectByIp(response.ToString());
+							if (bytes == 1 && data[0] == readyPacket)
+							{
+								this.Dispatcher.Invoke(() =>
+								{
+									cancelation = false;
+									waitWindow.Close();
+									connectionSuccessful();
+								});
+							}
+						} while (stream.DataAvailable);
+					}
+					catch(Exception ex) { MessageBox.Show(ex.ToString()); }
+				});
+				waitWindow.Closing += (sendr, ev) => { if(cancelation) tcpClientOpponent.Close(); };
+				waitWindow.ShowDialog();
 
-				// Закрываем потоки
-				stream.Close();
-				client.Close();
+				// open waitwindow to wait put number
+				//waitWindow = new WaitWindow() { Owner = this };
+				//waitWindow.ShowDialog();
 
-				// открываем окно ожидания подключения
-				waitForConnect();
+				playingOnServer = true;
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.ToString());
 			}
 		}
+		// TODO Waitwindow ready closing disable
 
 		void showOpponentsUIElements()
 		{
@@ -467,7 +493,7 @@ namespace Bulls_and_cows
 
 		void connectionSuccessful()
 		{
-			MessageBox.Show("Соедениние успешно.\nЗагадайте число и нажмите старт");
+			MessageBox.Show(this, "Соедениние успешно.\nЗагадайте число и нажмите старт");
 			Task.Run(() => listenOpponent());
 			showOpponentsUIElements();
 			Task.Run(() => checkConnection());
@@ -516,50 +542,45 @@ namespace Bulls_and_cows
 					{
 						bytes = stream.Read(data, 0, data.Length);
 
-						if(bytes == 1 && data[0] == readyPacket)
+						if(!opponentIsReady && bytes == 1 && data[0] == readyPacket)
 							receivedReady = true;
 
 						if(opponentIsReady)
 							response.Append(Encoding.Unicode.GetString(data, 0, bytes));
 					} while (stream.DataAvailable);
 
-
 					if (receivedReady)
 					{
 						this.Dispatcher.Invoke(() => opponentReady());
-			//			stream.Close();
 						continue;
 					}
-
 					if (!opponentIsReady || answerNumber == null)
 					{
-			//			stream.Close();
 						continue;
 					}
 
 					answerNumber.CheckMatches(response.ToString());
 
-					data = new byte[] { (byte)answerNumber.Bulls, (byte)answerNumber.Cows };
-					stream.Write(data, 0, data.Length);
-					//		stream.Close();
+					if (!playingOnServer)
+					{
+						data = new byte[] { (byte)answerNumber.Bulls, (byte)answerNumber.Cows };
+						stream.Write(data, 0, data.Length);
+						//		stream.Close();
+					}
 
 					if (bytes == 2) // answer first byte - bulls count, second - cows count
 					{
 						continue;
 					}
 
-					this.Dispatcher.Invoke(() => opponentDataGrid.Items.Add(new Attempt
-					{
-						Num = answerNumber.Attempts,
-						Number = response.ToString(),
-						Bulls = answerNumber.Bulls,
-						Cows = answerNumber.Cows
-					}));
+					this.Dispatcher.Invoke(() => AddAttemptToDataGrid(opponentDataGrid,
+						answerNumber.Attempts, response.ToString(),
+						answerNumber.Bulls, answerNumber.Cows));
 				}
 			}
 			catch (System.IO.IOException ex)
 			{
-				opponentLeftMessage();
+			//	opponentLeftMessage();
 			}
 			catch (Exception ex)
 			{
@@ -575,12 +596,13 @@ namespace Bulls_and_cows
 
 		void opponentLeftMessage()
 		{
-			// TODO fix double msg
-			MessageBox.Show("It seems your opponent left the game.");
+			isStarted = false;
+			MessageBox.Show(this, "It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
 		}
 
 		void StopGameOnline()
 		{
+			playingOnServer = false;
 			disableOpponentsUI();
 			StopGame();
 		}

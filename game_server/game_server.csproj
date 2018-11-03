@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BullAndCowsServer.cs" />
-    <Compile Include="ClientObject.cs" />
+    <Compile Include="PlayerObject.cs" />
     <Compile Include="ConnectServer.cs" />
     <Compile Include="HiddenNumber.cs" />
     <Compile Include="Program.cs" />
