@@ -39,6 +39,13 @@ namespace game_server
 					PlayerObject clientObject = new PlayerObject(client);
 					clientObject.ClientDisconnected += ClientObject_ClientDisconnected;
 
+					// проверка первого в очереди клиента
+					if (ClientsQueue.First()?.client.Connected == false)
+					{
+						ClientsQueue.RemoveAt(0);
+						Console.WriteLine("1-й клиент из очереди не отвечает. Отключаем...");
+					}
+
 					// из очереди присваиваем игроку соперника - другого игрока, или добавляем в очередь при отсутствии
 					if (ClientsQueue.Count > 0)
 					{
