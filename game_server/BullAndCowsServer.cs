@@ -62,29 +62,22 @@ namespace game_server
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("-----");
-				Console.WriteLine(ex);
-				Console.WriteLine("-----");
+				Console.WriteLine("/n----- EXCEPTION -----");
+				Console.WriteLine(ex.ToString());
+				Console.ReadKey();
 			}
 			finally
 			{
 				if (listener != null)
 					listener.Stop();
 			}
-
 		}
 
 		private void ClientObject_ClientDisconnected(PlayerObject playerObject)
 		{
+			// TODO fix
 			ClientsQueue.Remove(playerObject);
+			Console.WriteLine($"Отключен {playerObject.HostName}");
 		}
 	}
 }
-/*
- * client -> server [ok]
- * if client 1st wait window
- * if client 2nd   server -> 1st client send some signal to close wait window
- * 1st client readypacket -> server
- * [wait window]
- * 2nd client readypacket -> server -> 1st client to close wait window
- */

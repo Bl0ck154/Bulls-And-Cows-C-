@@ -13,7 +13,8 @@ namespace game_server
 		static void Main(string[] args)
 		{
 			//	new ConnectServer().Start();
-			new BullAndCowsServer().Start();
+			BullAndCowsServer bullAndCowsServer = new BullAndCowsServer();
+			bullAndCowsServer.Start();
 		}
 	}
 }

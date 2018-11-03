@@ -47,7 +47,7 @@
   <ItemGroup>
     <Compile Include="BullAndCowsServer.cs" />
     <Compile Include="PlayerObject.cs" />
-    <Compile Include="ConnectServer.cs" />
+    <None Include="ConnectServer.cs" />
     <Compile Include="HiddenNumber.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -391,7 +391,7 @@ namespace Bulls_and_cows
 							}
 						} while (stream.DataAvailable);
 					}
-					catch(Exception ex) { MessageBox.Show(ex.ToString()); }
+					catch(Exception ex) { }
 				});
 				waitWindow.Closing += (sendr, ev) => { if(cancelation) tcpClientOpponent.Close(); };
 				waitWindow.ShowDialog();
@@ -407,7 +407,6 @@ namespace Bulls_and_cows
 				MessageBox.Show(this, ex.ToString());
 			}
 		}
-		// TODO Waitwindow ready closing disable
 
 		void showOpponentsUIElements()
 		{
