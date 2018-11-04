@@ -23,6 +23,7 @@ namespace game_server
 		{
 			try
 			{
+				Console.WriteLine("Запуск сервера... Порт " + port);
 				listener = new TcpListener(IPAddress.Any, port);
 				listener.Start();
 				Console.WriteLine("Ожидание подключений...");
@@ -40,7 +41,7 @@ namespace game_server
 					clientObject.ClientDisconnected += ClientObject_ClientDisconnected;
 
 					// проверка первого в очереди клиента
-					if (ClientsQueue.First()?.client.Connected == false)
+					if (ClientsQueue.FirstOrDefault()?.client.Client.Connected == false)
 					{
 						ClientsQueue.RemoveAt(0);
 						Console.WriteLine("1-й клиент из очереди не отвечает. Отключаем...");
@@ -69,7 +70,7 @@ namespace game_server
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("/n----- EXCEPTION -----");
+				Console.WriteLine("\n----- EXCEPTION -----");
 				Console.WriteLine(ex.ToString());
 				Console.ReadKey();
 			}
