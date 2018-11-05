@@ -11,9 +11,9 @@
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="Menu" Width="190">
 				<MenuItem Header="New game" Click="MenuItemNewGame_Click"></MenuItem>
-				<MenuItem Header="Find online game" Click="MenuItemFind_Click"></MenuItem>
-				<MenuItem Header="Connect by IP" Click="MenuItemConnectIP_Click"></MenuItem>
-				<MenuItem Header="Host game on port 7766" Click="MenuItemWait_Click"></MenuItem>
+				<MenuItem Name="FindOnlineMenuItem" Header="Find online game" Click="MenuItemFind_Click"></MenuItem>
+				<MenuItem Name="ConnectByIPMenuItem" Header="Connect by IP" Click="MenuItemConnectIP_Click"></MenuItem>
+				<MenuItem Name="HostGameMenuItem" Header="Host game on port 7766" Click="MenuItemWait_Click"></MenuItem>
 				<Separator/>
 				<MenuItem Header="Exit" Click="MenuItemExit_Click"></MenuItem>
 			</MenuItem>

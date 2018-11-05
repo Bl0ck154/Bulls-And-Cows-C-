@@ -362,6 +362,8 @@ namespace Bulls_and_cows
 		{
 			try
 			{
+				MenuItemsToggle(false);
+
 				tcpClientOpponent = new TcpClient();
 				tcpClientOpponent.Connect(Config.ServerIP, Config.RemotePort);
 				
@@ -393,7 +395,7 @@ namespace Bulls_and_cows
 					}
 					catch(Exception ex) { }
 				});
-				waitWindow.Closing += (sendr, ev) => { if(cancelation) tcpClientOpponent.Close(); };
+				waitWindow.Closing += (sendr, ev) => { if (cancelation) { tcpClientOpponent.Close(); MenuItemsToggle(true); } };
 				waitWindow.ShowDialog();
 
 				// open waitwindow to wait put number
@@ -514,9 +516,9 @@ namespace Bulls_and_cows
 
 		private void checkConnection()
 		{
-			while (tcpClientOpponent.Connected)
+			while (tcpClientOpponent?.Connected == true)
 			{
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 			}
 			if (!isClosed && isStarted)
 			{
@@ -581,11 +583,11 @@ namespace Bulls_and_cows
 			}
 			catch (System.IO.IOException ex)
 			{
-			//	opponentLeftMessage();
+				opponentLeftMessage();
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(this, ex.ToString());
+				MessageBox.Show(ex.Message);
 			}
 			finally
 			{
@@ -595,17 +597,30 @@ namespace Bulls_and_cows
 			}
 		}
 
+		bool message_shown = false;
 		void opponentLeftMessage()
 		{
 			isStarted = false;
-			MessageBox.Show(this, "It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
+
+			if (!message_shown)
+			{
+				MessageBox.Show("It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
+				message_shown = true;
+				Task.Run(() => { Thread.Sleep(2000); message_shown = false; });
+			}
 		}
 
 		void StopGameOnline()
 		{
+			MenuItemsToggle(true);
 			playingOnServer = false;
 			disableOpponentsUI();
 			StopGame();
+		}
+
+		void MenuItemsToggle(bool value)
+		{
+			FindOnlineMenuItem.IsEnabled = ConnectByIPMenuItem.IsEnabled = HostGameMenuItem.IsEnabled = value;
 		}
 
 		void disableOpponentsUI()
