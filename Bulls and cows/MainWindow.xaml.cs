@@ -125,7 +125,7 @@ namespace Bulls_and_cows
 			if (isConnected)
 			{
 				string number = getTextboxNumberValue();
-				if (number.Length < 4 || findRepeats(number))
+				if (number.Length < HiddenNumber.LENGTH || findRepeats(number))
 				{
 					MessageBox.Show(this, "Please enter 4 different numbers!");
 					return;
@@ -231,7 +231,7 @@ namespace Bulls_and_cows
 					AddAttemptToDataGrid(playerDataGrid, ++triesCount, textboxNumber,
 						data[0], data[1]);
 
-					if (data[0] == 4) // TODO
+					if (data[0] == HiddenNumber.LENGTH) // TODO
 					{
 						congratilations();
 					}
@@ -297,7 +297,7 @@ namespace Bulls_and_cows
 			Random random = new Random();
 			char randomed;
 			string generatedNum = "";
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < HiddenNumber.LENGTH; i++)
 			{
 				randomed = random.Next(0, 9).ToString()[0];
 				if (i > 0 && generatedNum.Contains(randomed))
@@ -494,7 +494,7 @@ namespace Bulls_and_cows
 
 		void connectionSuccessful()
 		{
-			MessageBox.Show(this, "Соединение успешно.\nЗагадайте число и нажмите старт");
+			MessageBox.Show(this, "Соединение успешно.\nЗагадайте число и нажмите старт"); // TODO translate
 			Task.Run(() => listenOpponent());
 			showOpponentsUIElements();
 			Task.Run(() => checkConnection());

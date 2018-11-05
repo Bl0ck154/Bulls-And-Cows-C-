@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Bulls_and_cows
 {
-    class HiddenNumber
+    public class HiddenNumber
 	{
+		public const int LENGTH = 4;
+
 		public string Number { get; set; }
 
 		public HiddenNumber() { }
