@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace game_server
+namespace BullsAndCowsAdditions
 {
-    class HiddenNumber
+	public class HiddenNumber
 	{
+		public const int LENGTH = 4;
+
 		public string Number { get; set; }
 
 		public HiddenNumber() { }
@@ -41,5 +43,10 @@ namespace game_server
 			}
 			return ++attempts;
 		}
-    }
+
+		public override string ToString()
+		{
+			return Number;
+		}
+	}
 }

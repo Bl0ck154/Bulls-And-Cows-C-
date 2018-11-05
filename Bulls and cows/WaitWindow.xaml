@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bulls_and_cows"
-        mc:Ignorable="d" FontSize="32" WindowStyle="ToolWindow"
+        mc:Ignorable="d" WindowStyle="ToolWindow" FontSize="16"
 		WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-        Title="Waiting connection" Height="150" Width="200">
-    <Grid>
-		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Name="text">...</TextBlock>
-    </Grid>
+        Title="Waiting for connection" Height="150" Width="250">
+	<Grid Margin="10">
+		<TextBlock HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Tahoma" VerticalAlignment="Top" Name="messageBlock" TextWrapping="Wrap"></TextBlock>
+		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="32" Name="text">...</TextBlock>
+	</Grid>
 </Window>

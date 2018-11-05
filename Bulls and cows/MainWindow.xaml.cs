@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
+using BullsAndCowsAdditions;
 
 namespace Bulls_and_cows
 {
@@ -157,7 +150,7 @@ namespace Bulls_and_cows
 				}
 				else
 				{
-					WaitWindow waitWindow = new WaitWindow() { Owner = this, Title = "Please wait your opponent" };
+					WaitWindow waitWindow = new WaitWindow() { Owner = this, Title = "Please wait your opponent", Message = Title };
 					waitWindow.ShowDialog();
 				}
 				clearTextboxes();
@@ -271,8 +264,13 @@ namespace Bulls_and_cows
 
 		void congratilations()
 		{
-			MessageBox.Show(this, "Congratilations! You win!", "You win!");
-			StopGame();
+			string message = "Congratilations!\nYou win!";
+			message += "\nAttempts: " + triesCount;
+			message += "\nTime: " + textTimer.Text;
+			MessageBox.Show(this, message, "You win!");
+
+			if (isConnected) StopGameOnline();
+			else StopGame();
 		}
 
 		void StopGame()
@@ -372,7 +370,7 @@ namespace Bulls_and_cows
 				int bytes;
 
 				// open waitwindow to wait opponent
-				WaitWindow waitWindow = new WaitWindow() { Owner = this };
+				WaitWindow waitWindow = new WaitWindow() { Owner = this, Message = "Searching for an opponent" };
 				bool cancelation = true;
 				Task.Run(() =>
 				{
@@ -425,7 +423,7 @@ namespace Bulls_and_cows
 
 				server.Start();
 
-				WaitWindow waitWindow = new WaitWindow() { Owner = this };
+				WaitWindow waitWindow = new WaitWindow() { Owner = this, Message = "Waiting for connection on port " + Config.RemotePort };
 				Thread task = new Thread(() => {
 					while (tcpClientOpponent == null)
 					{
@@ -571,6 +569,11 @@ namespace Bulls_and_cows
 
 					answerNumber.CheckMatches(response.ToString());
 
+					if (answerNumber.Bulls == HiddenNumber.LENGTH)
+					{
+						YouLoseDisconnect();
+					}
+
 					if (!playingOnServer)
 					{
 						data = new byte[] { (byte)answerNumber.Bulls, (byte)answerNumber.Cows };
@@ -598,18 +601,25 @@ namespace Bulls_and_cows
 			}
 			finally
 			{
-				tcpClientOpponent?.Close();
-				tcpClientOpponent = null;
 				this.Dispatcher.Invoke(() => StopGameOnline());
 			}
 		}
-		
+
+		private void YouLoseDisconnect()
+		{
+			string message = $"You lose!\nYour opponent guessed your number {answerNumber}!";
+			message += "\nAttempts: " + answerNumber.Attempts;
+			message += "\nTime: " + textTimer.Text;
+			MessageBox.Show(this, message, "You lose!");
+
+			if (isConnected) StopGameOnline();
+		}
+
 		void opponentLeftMessage()
 		{
 			isStarted = false;
 
 			MessageBox.Show("It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
-			
 		}
 
 		void StopGameOnline()
@@ -618,6 +628,8 @@ namespace Bulls_and_cows
 			MenuItemsToggle(true);
 			playingOnServer = false;
 			disableOpponentsUI();
+			tcpClientOpponent?.Close();
+			tcpClientOpponent = null;
 			StopGame();
 		}
 

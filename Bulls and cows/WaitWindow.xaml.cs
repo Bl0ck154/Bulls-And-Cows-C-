@@ -20,6 +20,7 @@ namespace Bulls_and_cows
 	/// </summary>
 	public partial class WaitWindow : Window
 	{
+		public string Message { get; set; }
 		public WaitWindow()
 		{
 			InitializeComponent();
@@ -27,6 +28,13 @@ namespace Bulls_and_cows
 			timer.Interval = new TimeSpan(0, 0, 0, 0, 200); // 200 milliseconds
 			timer.Tick += Timer_Tick;
 			timer.Start();
+
+			Loaded += WaitWindow_Loaded;
+		}
+
+		private void WaitWindow_Loaded(object sender, RoutedEventArgs e)
+		{
+			messageBlock.Text = Message;
 		}
 
 		private void Timer_Tick(object sender, EventArgs e)

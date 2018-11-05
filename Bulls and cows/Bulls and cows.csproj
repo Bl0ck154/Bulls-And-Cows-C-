@@ -37,6 +37,9 @@
     <ApplicationIcon>cow.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BullsAndCowsAdditions">
+      <HintPath>..\BullsAndCowsAdditions\bin\Debug\BullsAndCowsAdditions.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -61,7 +64,6 @@
     <Compile Include="ConnectWindow.xaml.cs">
       <DependentUpon>ConnectWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HiddenNumber.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="WaitWindow.xaml.cs">
       <DependentUpon>WaitWindow.xaml</DependentUpon>
