@@ -23,10 +23,10 @@ namespace game_server
 		{
 			try
 			{
-				Console.WriteLine("Запуск сервера... Порт " + port);
+				Logger.Log("Запуск сервера... Порт " + port);
 				listener = new TcpListener(IPAddress.Any, port);
 				listener.Start();
-				Console.WriteLine("Ожидание подключений...");
+				Logger.Log("Ожидание подключений...");
 				IPEndPoint iPEndPoint;
 
 				while (true)
@@ -34,7 +34,7 @@ namespace game_server
 					TcpClient client = listener.AcceptTcpClient();
 
 					iPEndPoint = (client.Client.RemoteEndPoint as IPEndPoint);
-					Console.WriteLine($"Подключен клиент {iPEndPoint.Address}:{iPEndPoint.Port}...");
+					Logger.Log($"Подключен клиент {iPEndPoint.Address}:{iPEndPoint.Port}...");
 
 					// при подключении клиента создавать обьект класса игрока
 					PlayerObject clientObject = new PlayerObject(client);
@@ -44,7 +44,7 @@ namespace game_server
 					if (ClientsQueue.FirstOrDefault()?.client.Client.Connected == false)
 					{
 						ClientsQueue.RemoveAt(0);
-						Console.WriteLine("1-й клиент из очереди не отвечает. Отключаем...");
+						Logger.Log("1-й клиент из очереди не отвечает. Отключаем...");
 					}
 
 					// из очереди присваиваем игроку соперника - другого игрока, или добавляем в очередь при отсутствии
@@ -56,12 +56,12 @@ namespace game_server
 						playerTwo.opponent = clientObject;
 
 						iPEndPoint = (playerTwo.client.Client.RemoteEndPoint as IPEndPoint);
-						Console.WriteLine($"Спарен с {iPEndPoint.Address}:{iPEndPoint.Port}...");
+						Logger.Log($"Спарен с {iPEndPoint.Address}:{iPEndPoint.Port}...");
 					}
 					else
 					{
 						ClientsQueue.Add(clientObject);
-						Console.WriteLine("Отправлен в очередь");
+						Logger.Log("Отправлен в очередь");
 					}
 
 					// создаем новый поток для обслуживания нового игрока
@@ -70,8 +70,8 @@ namespace game_server
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("\n----- EXCEPTION -----");
-				Console.WriteLine(ex.ToString());
+				Logger.Log("\n----- EXCEPTION -----");
+				Logger.Log(ex.ToString());
 				Console.ReadKey();
 			}
 			finally
@@ -85,7 +85,7 @@ namespace game_server
 		{
 			// TODO fix
 			ClientsQueue.Remove(playerObject);
-			Console.WriteLine($"Отключен {playerObject.HostName}");
+			Logger.Log($"Отключен {playerObject.HostName}");
 		}
 	}
 }
