@@ -520,9 +520,11 @@ namespace Bulls_and_cows
 			{
 				Thread.Sleep(200);
 			}
+
+			opponentLeftMessage();
+
 			if (!isClosed && isStarted)
 			{
-				opponentLeftMessage();
 				this.Dispatcher.Invoke(() => StopGameOnline());
 			}
 		}
@@ -583,7 +585,7 @@ namespace Bulls_and_cows
 			}
 			catch (System.IO.IOException ex)
 			{
-				opponentLeftMessage();
+			//	opponentLeftMessage();
 			}
 			catch (Exception ex)
 			{
@@ -596,18 +598,13 @@ namespace Bulls_and_cows
 				this.Dispatcher.Invoke(() => StopGameOnline());
 			}
 		}
-
-		bool message_shown = false;
+		
 		void opponentLeftMessage()
 		{
 			isStarted = false;
 
-			if (!message_shown)
-			{
-				MessageBox.Show("It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
-				message_shown = true;
-				Task.Run(() => { Thread.Sleep(2000); message_shown = false; });
-			}
+			MessageBox.Show("It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
+			
 		}
 
 		void StopGameOnline()
