@@ -505,12 +505,17 @@ namespace Bulls_and_cows
 			opponentIsReady = true;
 			if (answerNumber != null)
 			{
-				foreach (Window item in Application.Current.Windows)
-				{
-					if (item is WaitWindow)
-						item.Close();
-				}
+				closeWaitWindows();
 				StartGame();
+			}
+		}
+
+		void closeWaitWindows()
+		{
+			foreach (Window item in Application.Current.Windows)
+			{
+				if (item is WaitWindow)
+					item.Close();
 			}
 		}
 
@@ -545,7 +550,7 @@ namespace Bulls_and_cows
 					{
 						bytes = stream.Read(data, 0, data.Length);
 						if (bytes == 0)
-							throw new Exception("Lost connect");
+							throw new System.IO.IOException("Lost connect");
 
 						if (!opponentIsReady && bytes == 1 && data[0] == readyPacket)
 							receivedReady = true;
@@ -609,6 +614,7 @@ namespace Bulls_and_cows
 
 		void StopGameOnline()
 		{
+			closeWaitWindows();
 			MenuItemsToggle(true);
 			playingOnServer = false;
 			disableOpponentsUI();
