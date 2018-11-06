@@ -271,7 +271,7 @@ namespace Bulls_and_cows
 			else StopGame();
 
 			string message = "Congratilations!\nYou win!";
-			message += "\nAttempts: " + (isConnected ? triesCount : answerNumber.Attempts);
+			message += "\nAttempts: " + (triesCount > 0 ? triesCount : answerNumber.Attempts);
 			message += "\nTime: " + textTimer.Text;
 			MessageBox.Show(this, message, "You win!");
 		}
@@ -366,7 +366,7 @@ namespace Bulls_and_cows
 				MenuItemsToggle(false);
 
 				tcpClientOpponent = new TcpClient();
-				tcpClientOpponent.Connect(Config.ServerIP, Config.RemotePort);
+				tcpClientOpponent.Connect(GameIPConfig.ServerIPAddress, GameIPConfig.Port);
 				
 				byte[] data = new byte[256];
 				NetworkStream stream = tcpClientOpponent.GetStream();
@@ -418,11 +418,11 @@ namespace Bulls_and_cows
 		{
 			try
 			{
-				TcpListener server = new TcpListener(IPAddress.Any, Config.RemotePort);
+				TcpListener server = new TcpListener(IPAddress.Any, GameIPConfig.Port);
 
 				server.Start();
 
-				WaitWindow waitWindow = new WaitWindow() { Owner = this, Message = "Waiting for connection on port " + Config.RemotePort };
+				WaitWindow waitWindow = new WaitWindow() { Owner = this, Message = "Waiting for connection on port " + GameIPConfig.Port };
 				Thread task = new Thread(() => {
 					while (tcpClientOpponent == null)
 					{
@@ -458,12 +458,12 @@ namespace Bulls_and_cows
 		{
 			string[] parts = IPPort.Split(':');
 			string Ip = parts[0];
-			if (!ValidateIPv4(Ip) || parts.Length < 2)
+			if (!ValidateIPv4(Ip))
 			{
 				MessageBox.Show(this, "Incorrect IP address - " + Ip, "Error");
 				return false;
 			}
-			string port = parts[1];
+			string port = parts.Length < 2 ? GameIPConfig.Port.ToString() : parts[1];
 			if(!IsStringNumeric(port))
 			{
 				MessageBox.Show(this, "Incorrect port - " + port, "Error");
@@ -491,7 +491,7 @@ namespace Bulls_and_cows
 
 		void connectionSuccessful()
 		{
-			MessageBox.Show(this, "Соединение успешно.\nЗагадайте число и нажмите старт"); // TODO translate
+			MessageBox.Show(this, "Connection succeeded!\nPlease set number and press start."); // TODO translate
 			Task.Run(() => listenOpponent());
 			showOpponentsUIElements();
 			Task.Run(() => checkConnection());
@@ -568,11 +568,6 @@ namespace Bulls_and_cows
 
 					answerNumber.CheckMatches(response.ToString());
 
-					if (answerNumber.Bulls == HiddenNumber.LENGTH)
-					{
-						YouLoseDisconnect();
-					}
-
 					if (!playingOnServer)
 					{
 						data = new byte[] { (byte)answerNumber.Bulls, (byte)answerNumber.Cows };
@@ -580,7 +575,7 @@ namespace Bulls_and_cows
 						//		stream.Close();
 					}
 
-					if (bytes == 2) // answer first byte - bulls count, second - cows count
+					if (bytes == 2) // answer first byte = bulls count, second = cows count
 					{
 						continue;
 					}
@@ -588,6 +583,12 @@ namespace Bulls_and_cows
 					this.Dispatcher.Invoke(() => AddAttemptToDataGrid(opponentDataGrid,
 						answerNumber.Attempts, response.ToString(),
 						answerNumber.Bulls, answerNumber.Cows));
+
+					if (answerNumber.Bulls == HiddenNumber.LENGTH)
+					{
+						this.Dispatcher.Invoke(() => YouLoseDisconnect());
+						break;
+					}
 				}
 			}
 			catch (System.IO.IOException ex)
@@ -611,13 +612,14 @@ namespace Bulls_and_cows
 			message += "\nTime: " + textTimer.Text;
 			MessageBox.Show(this, message, "You lose!");
 
-			if (isConnected) StopGameOnline();
+		//	if (isConnected) StopGameOnline();
 		}
 
 		void opponentLeftMessage()
 		{
 			isStarted = false;
-			this.Dispatcher.Invoke(() =>  MessageBox.Show(this, "It seems your opponent left the game.",
+			if(isConnected)
+				this.Dispatcher.Invoke(() =>  MessageBox.Show(this, "It seems your opponent left the game.",
 				"Connection lost", MessageBoxButton.OK, MessageBoxImage.Information));
 		}
 

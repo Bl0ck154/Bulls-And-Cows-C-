@@ -23,9 +23,7 @@ namespace Bulls_and_cows
 		public ConnectWindow()
 		{
 			InitializeComponent();
-			// debug
-			textboxIp.Text = Config.LocalIPPort;
-			
+
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)

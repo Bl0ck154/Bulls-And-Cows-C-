@@ -37,6 +37,12 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
+		<Style TargetType="{x:Type DataGrid}">
+			<Setter Property="FontSize" Value="17"></Setter>
+			<Setter Property="AutoGenerateColumns" Value="False"></Setter>
+			<Setter Property="IsReadOnly" Value="True"></Setter>
+			<Setter Property="Margin" Value="2"></Setter>
+		</Style>
 	</Window.Resources>
 	<DockPanel>
 		<Menu DockPanel.Dock="Top" FontSize="16" FontWeight="Light" 
@@ -114,8 +120,7 @@
 			</GroupBox>
 			
 			<GroupBox Header="Your attempts:" Grid.Row="2" Grid.Column="0">
-				<DataGrid FontSize="17" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*"
-					  Name="playerDataGrid" Margin="2">
+				<DataGrid Name="playerDataGrid" ColumnWidth="*">
 					<DataGrid.Columns>
 						<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
 						<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>
@@ -126,8 +131,7 @@
 			</GroupBox>
 
 			<GroupBox Header="Opponent attempts:" Grid.Row="2" Grid.Column="1">
-				<DataGrid FontSize="17" AutoGenerateColumns="False" IsReadOnly="True" ColumnWidth="*"
-					  Name="opponentDataGrid" Margin="2" IsEnabled="False">
+				<DataGrid Name="opponentDataGrid" IsEnabled="False" ColumnWidth="*">
 					<DataGrid.Columns>
 						<DataGridTextColumn Width="0.5*" Header="Try" Binding="{Binding Num}"/>
 						<DataGridTextColumn Header="Number"  Binding="{Binding Number}"/>

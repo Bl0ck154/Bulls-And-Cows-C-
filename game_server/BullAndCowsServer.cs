@@ -5,12 +5,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using BullsAndCowsAdditions;
 
 namespace game_server
 {
 	class BullAndCowsServer
 	{
-		const int port = 7766;
+		const int port = GameIPConfig.Port;
 		TcpListener listener;
 		List<PlayerObject> ClientsQueue;
 
