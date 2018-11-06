@@ -4,11 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bulls_and_cows"
-        mc:Ignorable="d"
-		WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" Style="{StaticResource VS2012WindowStyle}"
+		Background="Red"
+		WindowStartupLocation="CenterScreen" Icon="cow48.ico"
         Title="Bull And Cows Game" Height="450" Width="600" MinHeight="300" MinWidth="300">
+	<Window.Resources>
+		<Style TargetType="{x:Type Button}">
+			<Setter Property="Background" Value="{StaticResource VS2012WindowBorderBrush}" />
+			<Setter Property="Foreground" Value="White" />
+			<Setter Property="FontSize" Value="17" />
+			<Setter Property="FontWeight" Value="Medium" />
+			<Setter Property="SnapsToDevicePixels" Value="True" />
+
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Border CornerRadius="4" BorderBrush="Black" BorderThickness="1" Background="{TemplateBinding Background}">
+							<ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+						</Border>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter Property="Background" Value="#FF1DE099" />
+								<Setter Property="Foreground" Value="White" />
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter Property="Background" Value="{StaticResource TitleBarBackgroundBrush}" />
+								<Setter Property="Foreground" Value="White" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</Window.Resources>
 	<DockPanel>
-		<Menu DockPanel.Dock="Top">
+		<Menu DockPanel.Dock="Top" FontSize="16" FontWeight="Light" 
+			  BorderThickness="0,0,0,1" BorderBrush="#FFD1F3D1" Background="{StaticResource WindowBackgroundBrush}">
 			<MenuItem Header="Menu" Width="190">
 				<MenuItem Header="New single game" Click="MenuItemNewGame_Click"></MenuItem>
 				<Separator/>
@@ -22,7 +54,7 @@
 				<MenuItem></MenuItem>
 			</MenuItem>
 		</Menu>
-		<StatusBar DockPanel.Dock="Bottom">
+		<StatusBar DockPanel.Dock="Bottom" FontSize="16" FontWeight="Light">
 			Timer:
 			<TextBlock Name="textTimer">00:00</TextBlock>
 			<Label Content="           "></Label>
@@ -66,6 +98,7 @@
 					<TextBox Name="textboxNum2" Grid.Column="2"></TextBox>
 					<TextBox Name="textboxNum3" Grid.Column="3"></TextBox>
 					<TextBox Name="textboxNum4" Grid.Column="4"></TextBox>
+
 					<Button Grid.Column="6" Click="Button_Click" Name="btnStart">Start</Button>
 
 					<Popup Name="popupInfo" PopupAnimation="Fade" AllowsTransparency="True" HorizontalOffset="100" MouseDown="popupInfo_MouseDown">

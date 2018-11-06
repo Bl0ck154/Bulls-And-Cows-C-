@@ -592,7 +592,7 @@ namespace Bulls_and_cows
 			}
 			catch (System.IO.IOException ex)
 			{
-			//	opponentLeftMessage();
+	//			opponentLeftMessage();
 			}
 			catch (Exception ex)
 			{
@@ -617,8 +617,8 @@ namespace Bulls_and_cows
 		void opponentLeftMessage()
 		{
 			isStarted = false;
-
-			MessageBox.Show(this, "It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
+			this.Dispatcher.Invoke(() =>  MessageBox.Show(this, "It seems your opponent left the game.",
+				"Connection lost", MessageBoxButton.OK, MessageBoxImage.Information));
 		}
 
 		void StopGameOnline()
@@ -660,8 +660,8 @@ namespace Bulls_and_cows
 			{
 				connectResult = connectByIp(connectWindow.EnteredIP);
 			}
-
 		}
+
 		private void MenuItemWait_Click(object sender, RoutedEventArgs e)
 		{
 			waitForConnect();
