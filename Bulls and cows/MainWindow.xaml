@@ -48,6 +48,7 @@
 						<ColumnDefinition/>
 						<ColumnDefinition Width="2*"/>
 						<ColumnDefinition Width="4*"/>
+						<ColumnDefinition Width="0.5*"/>
 					</Grid.ColumnDefinitions>
 					<Grid.Resources>
 						<Style TargetType="TextBox">
@@ -66,6 +67,16 @@
 					<TextBox Name="textboxNum3" Grid.Column="3"></TextBox>
 					<TextBox Name="textboxNum4" Grid.Column="4"></TextBox>
 					<Button Grid.Column="6" Click="Button_Click" Name="btnStart">Start</Button>
+
+					<Popup Name="popupInfo" PopupAnimation="Fade" AllowsTransparency="True" HorizontalOffset="100" MouseDown="popupInfo_MouseDown">
+						<Border Opacity="0.95" Background="LightYellow" CornerRadius="4" BorderBrush="Black" BorderThickness="2" Width="350">
+							<TextBlock Name="popupText" Margin="10" TextWrapping="Wrap" FontSize="18"
+									   HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center">Test</TextBlock>
+							<Border.Effect>
+								<DropShadowEffect Opacity=".25" />
+							</Border.Effect>
+						</Border>
+					</Popup>
 				</Grid>
 			</GroupBox>
 			

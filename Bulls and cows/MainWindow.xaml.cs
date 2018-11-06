@@ -21,7 +21,7 @@ namespace Bulls_and_cows
 	public partial class MainWindow : Window
 	{
 		bool isStarted = false;
-		HiddenNumber answerNumber;
+		HiddenNumber answerNumber; 
 		DateTime startTime;
 		DispatcherTimer dispatcherTimer;
 		TcpClient tcpClientOpponent;
@@ -109,6 +109,7 @@ namespace Bulls_and_cows
 			else
 				Try();
 		}
+
 		const byte readyPacket = 234;
 		private void BtnStart()
 		{
@@ -120,7 +121,7 @@ namespace Bulls_and_cows
 				string number = getTextboxNumberValue();
 				if (number.Length < HiddenNumber.LENGTH || findRepeats(number))
 				{
-					MessageBox.Show(this, "Please enter 4 different numbers!");
+					showPopup("Please enter 4 different numbers!", 2500);
 					return;
 				}
 
@@ -180,8 +181,10 @@ namespace Bulls_and_cows
 			startTime = DateTime.Now;
 			dispatcherTimer = new DispatcherTimer();
 			dispatcherTimer.Tick += DispatcherTimer_Tick;
-			dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+			dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
 			dispatcherTimer.Start();
+
+			showPopup("The game has begun!\nYour task is to guess the number of the opponent!", 3300);
 		}
 
 		private void Try()
@@ -189,19 +192,19 @@ namespace Bulls_and_cows
 			string textboxNumber = getTextboxNumberValue();
 			if (!IsStringNumeric(textboxNumber) || textboxNumber.Length < answerNumber.Length)
 			{
-				MessageBox.Show(this, "Number format error", "Error");
+				showPopup("Number format error", 2500);
 				return;
 			}
 			if(findRepeats(textboxNumber))
 			{
-				MessageBox.Show(this, "Repetition found in the number", "Error");
+				showPopup("Repetition found in the number", 2500);
 				return;
 			}
 			if(playerDataGrid.Items.Count > 0) // check previous number
 			{
 				if((playerDataGrid.Items[playerDataGrid.Items.Count-1] as Attempt).Number == textboxNumber)
 				{
-					MessageBox.Show(this, "Your previous number is the same", "Error");
+					showPopup("Your previous number is the same", 2500);
 					return;
 				}
 			}
@@ -264,13 +267,13 @@ namespace Bulls_and_cows
 
 		void congratilations()
 		{
-			string message = "Congratilations!\nYou win!";
-			message += "\nAttempts: " + triesCount;
-			message += "\nTime: " + textTimer.Text;
-			MessageBox.Show(this, message, "You win!");
-
 			if (isConnected) StopGameOnline();
 			else StopGame();
+
+			string message = "Congratilations!\nYou win!";
+			message += "\nAttempts: " + (isConnected ? triesCount : answerNumber.Attempts);
+			message += "\nTime: " + textTimer.Text;
+			MessageBox.Show(this, message, "You win!");
 		}
 
 		void StopGame()
@@ -395,10 +398,6 @@ namespace Bulls_and_cows
 				});
 				waitWindow.Closing += (sendr, ev) => { if (cancelation) { tcpClientOpponent.Close(); MenuItemsToggle(true); } };
 				waitWindow.ShowDialog();
-
-				// open waitwindow to wait put number
-				//waitWindow = new WaitWindow() { Owner = this };
-				//waitWindow.ShowDialog();
 
 				playingOnServer = true;
 			}
@@ -619,7 +618,7 @@ namespace Bulls_and_cows
 		{
 			isStarted = false;
 
-			MessageBox.Show("It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
+			MessageBox.Show(this, "It seems your opponent left the game.", "Connection lost", MessageBoxButton.OK, MessageBoxImage.Information);
 		}
 
 		void StopGameOnline()
@@ -663,10 +662,33 @@ namespace Bulls_and_cows
 			}
 
 		}
-
 		private void MenuItemWait_Click(object sender, RoutedEventArgs e)
 		{
 			waitForConnect();
+		}
+
+		DispatcherTimer popupTimer;
+		void showPopup(string message, double duration)
+		{
+			popupInfo.IsOpen = true;
+			popupText.Text = message;
+
+			popupTimer?.Stop();
+			popupTimer = new DispatcherTimer();
+			popupTimer.Interval = TimeSpan.FromMilliseconds(duration);
+			popupTimer.Tick += (s, e) => closePopup();
+			popupTimer.Start();
+		}
+
+		void closePopup()
+		{
+			popupInfo.IsOpen = false;
+			popupTimer?.Stop();
+		}
+
+		private void popupInfo_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			closePopup();
 		}
 	}
 }
