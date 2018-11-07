@@ -156,7 +156,7 @@
 					<Button Grid.Column="6" Click="Button_Click" Name="btnStart">Start</Button>
 
 					<Popup x:Name="popupInfo" PopupAnimation="Fade" AllowsTransparency="True" HorizontalOffset="100" VerticalOffset="100" MouseDown="popupInfo_MouseDown">
-						<Border Opacity="0.95" Background="#F3FFE0" CornerRadius="4" Width="350" 
+						<Border Opacity="0.65" Background="#F3FFE0" CornerRadius="4" Width="350" 
 								BorderBrush="Black" BorderThickness="2" Margin="0,0,10,10">
 							<TextBlock Name="popupText" Margin="10" TextWrapping="Wrap" FontSize="18"
 									   HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center">Test</TextBlock>

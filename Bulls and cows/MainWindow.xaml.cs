@@ -154,7 +154,9 @@ namespace Bulls_and_cows
 				}
 				else
 				{
-					WaitWindow waitWindow = new WaitWindow() { Owner = this, Title = "Please wait your opponent", Message = Title };
+					WaitWindow waitWindow = new WaitWindow() { Owner = this,
+						Title = "Please wait your opponent", Message = "Please wait your opponent"
+					};
 					waitWindow.ShowDialog();
 				}
 			}
@@ -197,7 +199,7 @@ namespace Bulls_and_cows
 
 		private void Try()
 		{
-			if(TURN_MODE && myTurn == false)
+			if(TURN_MODE && isConnected && myTurn == false)
 			{
 				return;
 			}
@@ -244,8 +246,7 @@ namespace Bulls_and_cows
 					{
 						congratilations();
 					}
-
-					if(TURN_MODE)
+					else if(TURN_MODE)
 					{
 						opponentTurn();
 					}
@@ -393,14 +394,20 @@ namespace Bulls_and_cows
 
 		private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO better
-			SingleGameStart();
+			StopGameOnline();
+
+			DispatcherTimer delay = new DispatcherTimer();
+			delay.Interval = TimeSpan.FromMilliseconds(300);
+			delay.Tick += (s,ev) => { SingleGameStart(); delay.Stop(); };
+			delay.Start();
 		}
 
 		private void MenuItemFind_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
+				StopGameOnline();
+
 				MenuItemsToggle(false);
 
 				tcpClientOpponent = new TcpClient();
@@ -682,13 +689,14 @@ namespace Bulls_and_cows
 			closeWaitWindows();
 			MenuItemsToggle(true);
 			playingOnServer = false;
+			opponentIsReady = false;
 			disableOpponentsUI();
 			tcpClientOpponent?.Close();
 			tcpClientOpponent = null;
 			StopGame();
 			if (TURN_MODE)
 			{
-				btnStart.IsEnabled = true;
+				btnStart.IsEnabled = myTurn = true;
 			}
 		}
 
@@ -713,6 +721,8 @@ namespace Bulls_and_cows
 
 		private void MenuItemConnectIP_Click(object sender, RoutedEventArgs e)
 		{
+			StopGameOnline();
+
 			ConnectWindow connectWindow = new ConnectWindow() { Owner = this };
 			bool connectResult = false;
 
@@ -724,6 +734,8 @@ namespace Bulls_and_cows
 
 		private void MenuItemWait_Click(object sender, RoutedEventArgs e)
 		{
+			StopGameOnline();
+
 			waitForConnect();
 		}
 
