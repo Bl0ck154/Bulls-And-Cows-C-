@@ -493,7 +493,7 @@ namespace Bulls_and_cows
 
 		void connectionSuccessful()
 		{
-			MessageBox.Show(this, "Connection succeeded!\nPlease set number and press start."); // TODO translate
+			MessageBox.Show(this, "Connection succeeded!\nPlease set number and press start.", "Opponent connected", MessageBoxButton.OK, MessageBoxImage.Information);
 			Task.Run(() => listenOpponent());
 			showOpponentsUIElements();
 			Task.Run(() => checkConnection());
@@ -618,12 +618,20 @@ namespace Bulls_and_cows
 		//	if (isConnected) StopGameOnline();
 		}
 
+		bool leftMsgShown = false;
 		void opponentLeftMessage()
 		{
 			isStarted = false;
-			if(isConnected)
-				this.Dispatcher.Invoke(() =>  MessageBox.Show(this, "It seems your opponent left the game.",
-				"Connection lost", MessageBoxButton.OK, MessageBoxImage.Information));
+
+			if (!leftMsgShown)
+			{
+				this.Dispatcher.Invoke(() => MessageBox.Show(this, "It seems your opponent left the game.",
+					"Connection lost", MessageBoxButton.OK, MessageBoxImage.Information));
+				leftMsgShown = true;
+				DispatcherTimer shownDisableTimer = new DispatcherTimer();
+				shownDisableTimer.Interval = TimeSpan.FromSeconds(3);
+				shownDisableTimer.Tick += (s, e) => { leftMsgShown = false; shownDisableTimer.Stop(); };
+			}
 		}
 
 		void StopGameOnline()
