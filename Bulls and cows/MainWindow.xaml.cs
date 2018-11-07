@@ -186,7 +186,7 @@ namespace Bulls_and_cows
 			dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
 			dispatcherTimer.Start();
 
-			showPopup("The game has begun!\nYour task is to guess the number of the opponent!", 3300);
+			showPopup("New game starts now!\nYour task is to guess the number of the opponent!", 3300);
 		}
 
 		private void Try()
