@@ -434,6 +434,7 @@ namespace Bulls_and_cows
 								{
 									cancelation = false;
 									waitWindow.Close();
+									playingOnServer = true;
 									connectionSuccessful();
 								});
 							}
@@ -443,8 +444,6 @@ namespace Bulls_and_cows
 				});
 				waitWindow.Closing += (sendr, ev) => { if (cancelation) { tcpClientOpponent.Close(); MenuItemsToggle(true); } };
 				waitWindow.ShowDialog();
-
-				playingOnServer = true;
 			}
 			catch (Exception ex)
 			{
