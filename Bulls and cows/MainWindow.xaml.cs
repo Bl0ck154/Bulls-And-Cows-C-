@@ -456,7 +456,8 @@ namespace Bulls_and_cows
 		{
 			opponentDataGrid.IsEnabled = true;
 			IPEndPoint client = (tcpClientOpponent.Client.RemoteEndPoint as IPEndPoint);
-			textOnline.Text = $"You playing online with: {client.Address}:{client.Port}";
+			textOnline.Text = playingOnServer ? $"You playing online" :
+				$"You playing online with: {client.Address}:{client.Port}";
 		}
 
 		void waitForConnect()

@@ -95,7 +95,12 @@
 	<DockPanel>
 		<Menu DockPanel.Dock="Top" FontSize="16" FontWeight="Light" 
 			  BorderThickness="0,0,0,1" BorderBrush="#FFD1F3D1" Background="{StaticResource WindowBackgroundBrush}">
-			<MenuItem Header="Menu" Width="190">
+			<Menu.ItemsPanel>
+				<ItemsPanelTemplate>
+					<DockPanel HorizontalAlignment="Stretch"/>
+				</ItemsPanelTemplate>
+			</Menu.ItemsPanel>
+			<MenuItem Header="Game menu" Width="190">
 				<MenuItem Header="New single game" Click="MenuItemNewGame_Click"></MenuItem>
 				<Separator/>
 				<MenuItem Name="FindOnlineMenuItem" Header="Find online game" Click="MenuItemFind_Click"></MenuItem>
@@ -104,7 +109,9 @@
 				<Separator/>
 				<MenuItem Header="Exit" Click="MenuItemExit_Click"></MenuItem>
 			</MenuItem>
-			<MenuItem Header="Your Hidden Number" Name="MenuItem_YourNumber" Visibility="Hidden">
+			
+			<MenuItem HorizontalAlignment="Right" Header="Show your hidden number" 
+					  Name="MenuItem_YourNumber" Visibility="Hidden">
 				<MenuItem></MenuItem>
 			</MenuItem>
 		</Menu>
@@ -112,7 +119,9 @@
 			Timer:
 			<TextBlock Name="textTimer">00:00</TextBlock>
 			<Label Content="           "></Label>
-			<TextBlock Name="textOnline"></TextBlock>
+			<StatusBarItem HorizontalAlignment="Right">
+				<TextBlock Name="textOnline"></TextBlock>
+			</StatusBarItem>
 		</StatusBar>
 		<Grid Margin="5 2">
 			<Grid.ColumnDefinitions>
