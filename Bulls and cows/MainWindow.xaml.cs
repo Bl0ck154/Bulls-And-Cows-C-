@@ -586,6 +586,7 @@ namespace Bulls_and_cows
 
 					if (answerNumber.Bulls == HiddenNumber.LENGTH)
 					{
+						stream.Write(data, 0, data.Length);
 						this.Dispatcher.Invoke(() => YouLoseDisconnect());
 						break;
 					}
@@ -610,7 +611,7 @@ namespace Bulls_and_cows
 			string message = $"You lose!\nYour opponent guessed your number {answerNumber}!";
 			message += "\nAttempts: " + answerNumber.Attempts;
 			message += "\nTime: " + textTimer.Text;
-			MessageBox.Show(this, message, "You lose!");
+			MessageBox.Show(this, message, "You lose!", MessageBoxButton.OK, MessageBoxImage.Information);
 
 		//	if (isConnected) StopGameOnline();
 		}
