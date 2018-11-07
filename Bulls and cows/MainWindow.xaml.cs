@@ -113,9 +113,6 @@ namespace Bulls_and_cows
 		const byte readyPacket = 234;
 		private void BtnStart()
 		{
-			playerDataGrid.Items.Clear();
-			opponentDataGrid.Items.Clear();
-			triesCount = 0;
 			if (isConnected)
 			{
 				string number = getTextboxNumberValue();
@@ -154,7 +151,6 @@ namespace Bulls_and_cows
 					WaitWindow waitWindow = new WaitWindow() { Owner = this, Title = "Please wait your opponent", Message = Title };
 					waitWindow.ShowDialog();
 				}
-				clearTextboxes();
 			}
 			else
 			{
@@ -176,9 +172,15 @@ namespace Bulls_and_cows
 
 		void StartGame()
 		{
+			playerDataGrid.Items.Clear();
+			opponentDataGrid.Items.Clear();
+			triesCount = 0;
+			clearTextboxes();
+
 			isStarted = true;
 			btnStart.Content = "Try";
 			startTime = DateTime.Now;
+
 			dispatcherTimer = new DispatcherTimer();
 			dispatcherTimer.Tick += DispatcherTimer_Tick;
 			dispatcherTimer.Interval = TimeSpan.FromSeconds(1);

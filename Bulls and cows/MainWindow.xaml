@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bulls_and_cows"
         mc:Ignorable="d" Style="{StaticResource VS2012WindowStyle}"
-		Background="Red"
 		WindowStartupLocation="CenterScreen" Icon="cow48.ico"
-        Title="Bull And Cows Game" Height="450" Width="600" MinHeight="300" MinWidth="300">
+        Title="Bull And Cows Game" Height="450" Width="600" MinHeight="300" MinWidth="400">
 	<Window.Resources>
 		<Style TargetType="{x:Type Button}">
 			<Setter Property="Background" Value="{StaticResource VS2012WindowBorderBrush}" />
@@ -108,7 +107,7 @@
 					<Button Grid.Column="6" Click="Button_Click" Name="btnStart">Start</Button>
 
 					<Popup Name="popupInfo" PopupAnimation="Fade" AllowsTransparency="True" HorizontalOffset="100" MouseDown="popupInfo_MouseDown">
-						<Border Opacity="0.95" Background="LightYellow" CornerRadius="4" BorderBrush="Black" BorderThickness="2" Width="350">
+						<Border Opacity="0.95" Background="#F3FFE0" CornerRadius="4" BorderBrush="Black" BorderThickness="2" Width="350">
 							<TextBlock Name="popupText" Margin="10" TextWrapping="Wrap" FontSize="18"
 									   HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center">Test</TextBlock>
 							<Border.Effect>
