@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bulls and cows", "Bulls and cows\Bulls and cows.csproj", "{50761C7B-2358-4CA7-BB09-39FD6608ACB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bulls_And_Cows_The_Game", "Bulls and cows\Bulls_And_Cows_The_Game.csproj", "{50761C7B-2358-4CA7-BB09-39FD6608ACB6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "game_server", "game_server\game_server.csproj", "{55021612-826E-4CA9-8A65-796E2B514E68}"
 EndProject

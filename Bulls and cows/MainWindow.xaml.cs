@@ -20,6 +20,8 @@ namespace Bulls_and_cows
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		const bool TURN_MODE = true;
+
 		bool isStarted = false;
 		HiddenNumber answerNumber; 
 		DateTime startTime;
@@ -145,6 +147,10 @@ namespace Bulls_and_cows
 				if (opponentIsReady)
 				{
 					StartGame();
+					if (TURN_MODE)
+					{
+						opponentTurn();
+					}
 				}
 				else
 				{
@@ -191,6 +197,11 @@ namespace Bulls_and_cows
 
 		private void Try()
 		{
+			if(TURN_MODE && myTurn == false)
+			{
+				return;
+			}
+
 			string textboxNumber = getTextboxNumberValue();
 			if (!IsStringNumeric(textboxNumber) || textboxNumber.Length < answerNumber.Length)
 			{
@@ -233,6 +244,11 @@ namespace Bulls_and_cows
 					{
 						congratilations();
 					}
+
+					if(TURN_MODE)
+					{
+						opponentTurn();
+					}
 				}
 				catch (Exception ex)
 				{
@@ -251,6 +267,26 @@ namespace Bulls_and_cows
 				}
 			}
 			focusOnFirst();
+		}
+
+		bool myTurn = false;
+		void yourTurn()
+		{
+			this.Dispatcher.Invoke(() =>
+			{
+				showPopup("Your turn!", 2000);
+				myTurn = btnStart.IsEnabled = true;
+			});
+			// TODO turn timer
+		}
+
+		void opponentTurn()
+		{
+			this.Dispatcher.Invoke(() =>
+			{
+				showPopup("Opponent turn!\nPlease wait...", 2000);
+				myTurn = btnStart.IsEnabled = false;
+			});
 		}
 
 		Attempt AddAttemptToDataGrid(DataGrid dataGrid, int attemptNumber, string number, int bulls, int cows)
@@ -506,6 +542,10 @@ namespace Bulls_and_cows
 			{
 				closeWaitWindows();
 				StartGame();
+				if (TURN_MODE)
+				{
+					yourTurn();
+				}
 			}
 		}
 
@@ -592,11 +632,16 @@ namespace Bulls_and_cows
 						this.Dispatcher.Invoke(() => YouLoseDisconnect());
 						break;
 					}
+
+					if(TURN_MODE)
+					{
+						yourTurn();
+					}
 				}
 			}
 			catch (System.IO.IOException ex)
 			{
-	//			opponentLeftMessage();
+				opponentLeftMessage();
 			}
 			catch (Exception ex)
 			{
@@ -614,8 +659,6 @@ namespace Bulls_and_cows
 			message += "\nAttempts: " + answerNumber.Attempts;
 			message += "\nTime: " + textTimer.Text;
 			MessageBox.Show(this, message, "You lose!", MessageBoxButton.OK, MessageBoxImage.Information);
-
-		//	if (isConnected) StopGameOnline();
 		}
 
 		bool leftMsgShown = false;
@@ -623,7 +666,7 @@ namespace Bulls_and_cows
 		{
 			isStarted = false;
 
-			if (!leftMsgShown)
+			if (!leftMsgShown && isConnected)
 			{
 				this.Dispatcher.Invoke(() => MessageBox.Show(this, "It seems your opponent left the game.",
 					"Connection lost", MessageBoxButton.OK, MessageBoxImage.Information));
@@ -643,6 +686,10 @@ namespace Bulls_and_cows
 			tcpClientOpponent?.Close();
 			tcpClientOpponent = null;
 			StopGame();
+			if (TURN_MODE)
+			{
+				btnStart.IsEnabled = true;
+			}
 		}
 
 		void MenuItemsToggle(bool value)
