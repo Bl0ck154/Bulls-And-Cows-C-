@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 	<SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FCFFFC" />
-    <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="#4BBDDE" />
-    <SolidColorBrush x:Key="VS2012WindowBorderBrush" Color="#54BB44" />
+    <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="#FFF0F1F1" />
+    <SolidColorBrush x:Key="VS2012WindowBorderBrush" Color="#FF252424" />
     <SolidColorBrush x:Key="VS2012WindowBorderBrushInactive" Color="#BBBBBB" />
     <SolidColorBrush x:Key="VS2012WindowStatusForeground" Color="#FFFFFF" />
     <SolidColorBrush x:Key="VS2012WindowStatusForegroundInactive" Color="#FFFFFF" />

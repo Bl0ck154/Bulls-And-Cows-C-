@@ -8,9 +8,11 @@
 		WindowStartupLocation="CenterScreen" Icon="cow48.ico"
         Title="Bull And Cows Game" Height="450" Width="600" MinHeight="300" MinWidth="400">
 	<Window.Resources>
+		<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                   Color="#FFB1ABAB"/>
 		<Style TargetType="{x:Type Button}">
-			<Setter Property="Background" Value="{StaticResource VS2012WindowBorderBrush}" />
-			<Setter Property="Foreground" Value="White" />
+			<Setter Property="Background" Value="{StaticResource TitleBarBackgroundBrush}" />
+			<Setter Property="Foreground" Value="{StaticResource VS2012WindowBorderBrush}" />
 			<Setter Property="FontSize" Value="17" />
 			<Setter Property="FontWeight" Value="Medium" />
 			<Setter Property="SnapsToDevicePixels" Value="True" />
@@ -24,11 +26,11 @@
 
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="Background" Value="#FF1DE099" />
-								<Setter Property="Foreground" Value="White" />
+								<Setter Property="Background" Value="#FFCFD9D5" />
+								<Setter Property="Foreground" Value="Black" />
 							</Trigger>
 							<Trigger Property="IsPressed" Value="True">
-								<Setter Property="Background" Value="{StaticResource TitleBarBackgroundBrush}" />
+								<Setter Property="Background" Value="{StaticResource VS2012WindowBorderBrush}" />
 								<Setter Property="Foreground" Value="White" />
 							</Trigger>
 							<Trigger Property="IsEnabled" Value="False">
@@ -40,23 +42,49 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
-		
+
+		<Style TargetType="GroupBox">
+			<Setter Property="HeaderTemplate">
+				<Setter.Value>
+					<DataTemplate>
+						<TextBlock Text="{Binding}" FontWeight="SemiBold" Foreground="White"/>
+					</DataTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
 		<Style TargetType="{x:Type DataGrid}">
+			<Style.Triggers>
+				<Trigger Property="IsEnabled" Value="False">
+					<Setter Property="Background" Value="#FFD7D7D3"></Setter>
+				</Trigger>
+			</Style.Triggers>
 			<Setter Property="FontSize" Value="15"></Setter>
 			<Setter Property="AutoGenerateColumns" Value="False"></Setter>
 			<Setter Property="IsReadOnly" Value="True"></Setter>
-			<Setter Property="Background" Value="#FFF5FFEC"></Setter>
+			<Setter Property="Background" Value="White"></Setter>
 
 			<Setter Property="BorderBrush" Value="#DDDDDD" />
 			<Setter Property="HorizontalGridLinesBrush" Value="#DDDDDD" />
 			<Setter Property="VerticalGridLinesBrush" Value="#DDDDDD" />
 
+			<Setter Property="ColumnHeaderStyle">
+				<Setter.Value>
+					<Style TargetType="DataGridColumnHeader">
+						<Setter Property="Background" Value="#FF353232"></Setter>
+						<Setter Property="Foreground" Value="White"></Setter>
+						<Setter Property="BorderThickness" Value="1"></Setter>
+						<Setter Property="BorderBrush" Value="White"></Setter>
+						<Setter Property="Padding" Value="3"></Setter>
+					</Style>
+				</Setter.Value>
+			</Setter>
 			<Setter Property="RowStyle">
 				<Setter.Value>
 					<Style TargetType="DataGridRow">
 						<Style.Triggers>
 							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="Background" Value="LightCyan" />
+								<Setter Property="Background" Value="#FFE5E8E8" />
 							</Trigger>
 						</Style.Triggers>
 					</Style>
@@ -93,8 +121,11 @@
 		</Style>
 	</Window.Resources>
 	<DockPanel>
+		<DockPanel.Background>
+			<ImageBrush ImageSource="background.png" Stretch="UniformToFill"></ImageBrush>
+		</DockPanel.Background>
 		<Menu DockPanel.Dock="Top" FontSize="16" FontWeight="Light" 
-			  BorderThickness="0,0,0,1" BorderBrush="#FFD1F3D1" Background="{StaticResource WindowBackgroundBrush}">
+			  BorderThickness="0,0,0,1" BorderBrush="{StaticResource TitleBarBackgroundBrush}" Background="{StaticResource WindowBackgroundBrush}">
 			<Menu.ItemsPanel>
 				<ItemsPanelTemplate>
 					<DockPanel HorizontalAlignment="Stretch"/>
@@ -148,6 +179,7 @@
 					<Grid.Resources>
 						<Style TargetType="TextBox">
 							<Setter Property="FontSize" Value="20"></Setter>
+							<Setter Property="FontWeight" Value="Heavy"></Setter>
 							<Setter Property="MaxLength" Value="1"></Setter>
 							<Setter Property="Margin" Value="2"></Setter>
 							<Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
@@ -164,8 +196,8 @@
 
 					<Button Grid.Column="6" Click="Button_Click" Name="btnStart">Start</Button>
 
-					<Popup x:Name="popupInfo" PopupAnimation="Fade" AllowsTransparency="True" HorizontalOffset="100" VerticalOffset="100" MouseDown="popupInfo_MouseDown">
-						<Border Opacity="0.65" Background="#F3FFE0" CornerRadius="4" Width="350" 
+					<Popup x:Name="popupInfo" PopupAnimation="Fade" AllowsTransparency="True" HorizontalOffset="125" VerticalOffset="100" MouseDown="popupInfo_MouseDown">
+						<Border Opacity="0.85" Background="#FFF9F9F9" CornerRadius="4" Width="300" 
 								BorderBrush="Black" BorderThickness="2" Margin="0,0,10,10">
 							<TextBlock Name="popupText" Margin="10" TextWrapping="Wrap" FontSize="18"
 									   HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center">Test</TextBlock>

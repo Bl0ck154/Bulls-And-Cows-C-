@@ -20,7 +20,7 @@ namespace Bulls_and_cows
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		const bool TURN_MODE = true;
+		const bool TURN_MODE = true; // пошаговый режим true - включен
 
 		bool isStarted = false;
 		HiddenNumber answerNumber; 
@@ -29,7 +29,7 @@ namespace Bulls_and_cows
 		TcpClient tcpClientOpponent;
 		public bool isConnected { get { return (tcpClientOpponent!= null && tcpClientOpponent.Connected); } }
 		bool opponentIsReady = false;
-		bool isClosed = false; // window was closed
+		bool isClosed = false;
 		int triesCount = 0;
 		bool playingOnServer = false;
 
@@ -276,7 +276,8 @@ namespace Bulls_and_cows
 			this.Dispatcher.Invoke(() =>
 			{
 				showPopup("Your turn!", 2000);
-				myTurn = btnStart.IsEnabled = true;
+				myTurn = btnStart.IsEnabled = playerDataGrid.IsEnabled = true;
+				opponentDataGrid.IsEnabled = false;
 			});
 			// TODO turn timer
 		}
@@ -286,7 +287,8 @@ namespace Bulls_and_cows
 			this.Dispatcher.Invoke(() =>
 			{
 				showPopup("Opponent turn!\nPlease wait...", 2000);
-				myTurn = btnStart.IsEnabled = false;
+				myTurn = btnStart.IsEnabled = playerDataGrid.IsEnabled = false;
+				opponentDataGrid.IsEnabled = true;
 			});
 		}
 
@@ -408,14 +410,14 @@ namespace Bulls_and_cows
 			{
 				StopGameOnline();
 
-				MenuItemsToggle(false);
-
 				tcpClientOpponent = new TcpClient();
 				tcpClientOpponent.Connect(GameIPConfig.ServerIPAddress, GameIPConfig.Port);
 				
 				byte[] data = new byte[256];
 				NetworkStream stream = tcpClientOpponent.GetStream();
 				int bytes;
+
+				MenuItemsToggle(false);
 
 				// open waitwindow to wait opponent
 				WaitWindow waitWindow = new WaitWindow() { Owner = this, Message = "Searching for an opponent" };
@@ -427,7 +429,7 @@ namespace Bulls_and_cows
 						do
 						{
 							bytes = stream.Read(data, 0, data.Length);
-
+						
 							if (bytes == 1 && data[0] == readyPacket)
 							{
 								this.Dispatcher.Invoke(() =>
@@ -696,7 +698,7 @@ namespace Bulls_and_cows
 			StopGame();
 			if (TURN_MODE)
 			{
-				btnStart.IsEnabled = myTurn = true;
+				btnStart.IsEnabled = myTurn = playerDataGrid.IsEnabled = true;
 			}
 		}
 
